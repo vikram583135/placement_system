@@ -1,0 +1,54 @@
+{% extends 'student/student_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block student_content %}
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Your Profile</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Keep your information current to ensure you are matched with the right job opportunities. Fields marked with an asterisk (*) are required.</p>
+        
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            
+            <fieldset class="border p-4 rounded mb-4">
+                <legend class="w-auto px-2 h6 fw-bold">Personal Details</legend>
+                <div class="row">
+                    <div class="col-md-6">{{ user_form.first_name|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ user_form.last_name|as_crispy_field }}</div>
+                </div>
+                 <div class="row">
+                    <div class="col-md-6">{{ user_form.email|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ profile_form.phone_number|as_crispy_field }}</div>
+                </div>
+            </fieldset>
+
+            <fieldset class="border p-4 rounded mb-4">
+                <legend class="w-auto px-2 h6 fw-bold">Academic Details</legend>
+                <div class="row">
+                    <div class="col-md-6">{{ profile_form.branch|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ profile_form.graduation_year|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">{{ profile_form.cgpa|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ profile_form.backlogs|as_crispy_field }}</div>
+                </div>
+            </fieldset>
+            
+            <fieldset class="border p-4 rounded">
+                <legend class="w-auto px-2 h6 fw-bold">Professional Details</legend>
+                {{ profile_form.skills|as_crispy_field }} <div class="row">
+                    <div class="col-md-6">{{ profile_form.linkedin_url|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ profile_form.github_url|as_crispy_field }}</div>
+                </div>
+            </fieldset>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save me-2"></i>Save Changes</button>
+                <a href="{% url 'core:student_dashboard' %}" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

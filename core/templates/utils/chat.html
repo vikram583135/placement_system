@@ -1,0 +1,83 @@
+{% extends 'student/student_base.html' %} {% block title %}Chat | {{ block.super }}{% endblock %}
+
+{% block student_content %}
+<div class="card shadow-sm" style="height: calc(100vh - 150px);">
+    <div class="row g-0 h-100">
+        <div class="col-12 col-lg-5 col-xl-3 border-end h-100 d-flex flex-column">
+            <div class="px-4 py-3 border-bottom">
+                <h5 class="d-none d-lg-block fw-bold">Conversations</h5>
+            </div>
+            <div class="flex-grow-1" style="overflow-y: auto;">
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action active p-3">
+                        <div class="d-flex align-items-start">
+                            <img src="https://via.placeholder.com/40" class="rounded-circle me-3" alt="TPO Admin">
+                            <div class="flex-grow-1">
+                                TPO Admin
+                                <div class="small"><span class="fas fa-circle chat-online me-1"></span> Online</div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action p-3">
+                        <div class="d-flex align-items-start">
+                            <img src="https://via.placeholder.com/40" class="rounded-circle me-3" alt="HR Google">
+                            <div class="flex-grow-1">
+                                HR (Google)
+                                <div class="small"><span class="badge bg-primary rounded-pill me-1">1</span><span class="fas fa-circle chat-offline me-1"></span> Offline</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-7 col-xl-9 h-100 d-flex flex-column">
+            <div class="py-2 px-4 border-bottom">
+                <div class="d-flex align-items-center py-1">
+                    <div class="position-relative"><img src="https://via.placeholder.com/40" class="rounded-circle me-3" alt="TPO Admin"></div>
+                    <div class="flex-grow-1 ps-3"><strong>TPO Admin</strong><div class="text-muted small">Active now</div></div>
+                </div>
+            </div>
+            
+            <div class="position-relative flex-grow-1">
+                <div class="chat-messages p-4" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; overflow-y: auto;">
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0 me-3"><img src="https://via.placeholder.com/40" class="rounded-circle" alt="TPO"></div>
+                        <div class="flex-grow-1">
+                            <div class="bg-light rounded py-2 px-3" style="max-width: 70%;">
+                                <div class="fw-bold mb-1">TPO Admin</div>
+                                Hello! I saw you had a question about the upcoming placement drive. How can I help?
+                            </div>
+                             <div class="text-muted small text-nowrap mt-1">2:33 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row-reverse mb-4">
+                         <div class="flex-shrink-0 ms-3"><img src="https://via.placeholder.com/40" class="rounded-circle" alt="You"></div>
+                         <div class="flex-grow-1 d-flex flex-column align-items-end">
+                            <div class="bg-primary text-white rounded py-2 px-3" style="max-width: 70%;">
+                                <div class="fw-bold mb-1">You</div>
+                                Hi! Yes, I was wondering about the eligibility criteria for the Microsoft opening.
+                            </div>
+                             <div class="text-muted small text-nowrap mt-1">2:34 AM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-grow-0 py-3 px-4 border-top">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Type your message">
+                    <button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.chat-online { color: #34c38f; }
+.chat-offline { color: #6c757d; }
+</style>
+{% endblock %}

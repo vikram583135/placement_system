@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Panel | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="d-flex" id="studentPanelWrapper">
+    <div class="bg-light border-end" id="sidebar-wrapper">
+        <div class="sidebar-heading border-bottom bg-white fw-bold text-primary">
+             <i class="fas fa-user-graduate me-2"></i>Student Panel
+        </div>
+        <div class="list-group list-group-flush">
+    <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}" href="{% url 'core:student_dashboard' %}">
+        <i class="fas fa-tachometer-alt fa-fw me-3"></i>Dashboard
+    </a>
+    <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'student_profile' %}active{% endif %}" href="{% url 'core:student_profile' %}">
+        <i class="fas fa-user-edit fa-fw me-3"></i>My Profile
+    </a>
+    <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'upload_resume' %}active{% endif %}" href="{% url 'core:upload_resume' %}">
+        <i class="fas fa-file-upload fa-fw me-3"></i>Upload Resume
+    </a>
+    <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'job_listings' %}active{% endif %}" href="{% url 'core:job_listings' %}">
+        <i class="fas fa-briefcase fa-fw me-3"></i>Job Listings
+    </a>
+
+    <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'applied_jobs' %}active{% endif %}" href="{% url 'core:applied_jobs' %}">
+        <i class="fas fa-check-square fa-fw me-3"></i>Applied Jobs
+    </a>
+    <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'interview_schedule' %}active{% endif %}" href="{% url 'core:interview_schedule' %}">
+        <i class="fas fa-calendar-alt fa-fw me-3"></i>Interviews
+    </a>
+    <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'placement_status' %}active{% endif %}" href="{% url 'core:placement_status' %}">
+        <i class="fas fa-trophy fa-fw me-3"></i>Placement Status
+    </a>
+
+    </div>
+    </div>
+
+    <div id="page-content-wrapper">
+        <div class="container-fluid p-4">
+            {% block student_content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    #studentPanelWrapper {
+        display: flex;
+    }
+    #sidebar-wrapper {
+        min-height: calc(100vh - 56px); /* Adjust 56px based on your navbar height */
+        width: 250px;
+        transition: margin .25s ease-out;
+    }
+    #page-content-wrapper {
+        flex: 1;
+        min-width: 0;
+        background-color: #f8f9fa;
+    }
+    /* Simple 'active' state for sidebar links based on URL name */
+    .list-group-item.active {
+        background-color: #0d6efd !important;
+        color: white !important;
+        border-color: #0d6efd !important;
+    }
+</style>
+{% endblock %}

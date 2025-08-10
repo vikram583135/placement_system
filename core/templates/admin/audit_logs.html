@@ -1,0 +1,28 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block admin_content %}
+<div class="card shadow-sm">
+    <div class="card-header"><h3 class="mb-0"><i class="fas fa-history me-2"></i>System Audit Logs</h3></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped">
+                <thead class="table-light">
+                    <tr><th>Timestamp</th><th>User (Role)</th><th>Action Performed</th></tr>
+                </thead>
+                <tbody>
+                    {% for log in logs_page_obj %}
+                    <tr>
+                        <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                        <td><strong>{{ log.user.username }}</strong> ({{ log.user.get_role_display }})</td>
+                        <td>{{ log.action }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center p-4">No log entries found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination Controls -->
+    </div>
+</div>
+{% endblock %}

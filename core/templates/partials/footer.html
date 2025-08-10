@@ -1,0 +1,48 @@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+            <h5 class="text-uppercase fw-bold">PlacementPro</h5>
+            <p class="text-muted">
+                A modern solution to streamline the campus placement process for students, companies, and administrators.
+            </p>
+            <div class="mt-4">
+                <a href="https://www.facebook.com" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.twitter.com" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.linkedin.com" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://www.github.com" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+            <h5 class="text-uppercase fw-bold">Links</h5>
+            <ul class="list-unstyled mb-0">
+                <li><a href="{% url 'core:about' %}" class="text-white-50 text-decoration-none">About Us</a></li>
+                <li><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
+                <li><a href="#" class="text-white-50 text-decoration-none">Contact</a></li>
+                <li><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+            </ul>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+            <h5 class="mb-3">Contact</h5>
+        <p class="mb-1">
+            <strong>Bangalore University</strong><br>
+            Jnana Bharathi Campus, Bengaluru, Karnataka 560056, India
+        </p>
+        <p class="mb-1">
+            <strong>Phone:</strong> +91-80-2296 1000
+        </p>
+        <p class="mb-1">
+            <strong>Email:</strong> <a href="mailto:registrar@bangaloreuniversity.ac.in" class="text-white">registrar@bangaloreuniversity.ac.in</a>
+        </p>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<div class="text-center p-3 mt-4" style="background-color: rgba(0, 0, 0, 0.2);">
+    © {% now "Y" %} Copyright:
+    <a class="text-white text-decoration-none fw-bold" href="{% url 'core:home' %}">PlacementPro.com</a>
+</div>
+

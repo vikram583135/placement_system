@@ -1,0 +1,37 @@
+{% extends 'student/student_base.html' %}
+{% load static %}
+
+{% block student_content %}  <div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm text-center">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-trophy me-2"></i>Your Placement Status</h3>
+            </div>
+            <div class="card-body p-5">
+                {% if student_profile.is_placed and placement_details %}
+                    <i class="fas fa-check-circle fa-5x text-success mb-4 animate__animated animate__tada"></i>
+                    <h1 class="display-4 fw-bold">Congratulations!</h1>
+                    <h3 class="text-muted">You have been placed at</h3>
+                    <h2 class="my-3">{{ placement_details.job.company.name }}</h2>
+                    <p class="lead">as a <strong>{{ placement_details.job.title }}</strong>.</p>
+                    <hr>
+                    <p>Further details regarding your offer letter and onboarding will be communicated to you by the TPO and the company HR. All the best for your future endeavors!</p>
+                    <a href="#" class="btn btn-success mt-3"><i class="fas fa-download me-2"></i>Download Offer Letter (if available)</a>
+                {% else %}
+                    <i class="fas fa-hourglass-half fa-5x text-info mb-4"></i>
+                    <h2 class="fw-bold">Your Journey Continues</h2>
+                    <p class="lead text-muted">You have not been placed yet. Don't lose hope!</p>
+                    <p>Keep your profile updated and continue applying for new opportunities. Every application is a step closer to your goal. Success is just around the corner.</p>
+                    <a href="{% url 'core:job_listings' %}" class="btn btn-primary mt-3"><i class="fas fa-briefcase me-2"></i>Explore More Jobs</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock student_content %} {% block extra_head %}
+    {{ block.super }} 
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+{% endblock %}

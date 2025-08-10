@@ -1,0 +1,46 @@
+{% extends 'company/company_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block company_content %}
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Schedule Interview for "{{ job.title }}"</h3>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Set the interview details below. An email notification will be sent to all shortlisted candidates for this job.</p>
+        
+        <h5 class="mt-4 fw-bold">Shortlisted Candidates ({{ shortlisted_count }})</h5>
+        {% if shortlisted_applications %}
+        <ul class="list-group mb-4">
+            {% for app in shortlisted_applications %}
+                <li class="list-group-item">{{ app.student.user.get_full_name }} ({{ app.student.user.email }})</li>
+            {% endfor %}
+        </ul>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <fieldset class="border p-4 rounded">
+                <legend class="w-auto px-2 h6 fw-bold">Interview Details</legend>
+                <div class="row">
+                    <div class="col-md-6">{{ form.interview_date|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ form.interview_time|as_crispy_field }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">{{ form.round_name|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ form.mode|as_crispy_field }}</div>
+                </div>
+                {{ form.venue_or_link|as_crispy_field }}
+                {{ form.additional_instructions|as_crispy_field }}
+            </fieldset>
+
+            <button type="submit" class="btn btn-primary btn-lg mt-4"><i class="fas fa-paper-plane me-2"></i>Schedule & Notify Candidates</button>
+        </form>
+        {% else %}
+        <div class="alert alert-warning mt-3">
+             No candidates have been shortlisted for this job yet. Please shortlist candidates from the applicants list before scheduling an interview.
+        </div>
+        <a href="{% url 'core:job_applicants' job.id %}" class="btn btn-secondary">Back to Applicants</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

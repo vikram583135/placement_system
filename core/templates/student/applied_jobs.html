@@ -1,0 +1,55 @@
+{% extends 'student/student_base.html' %}
+
+{% block student_content %}
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="mb-0"><i class="fas fa-check-square me-2"></i>Your Job Applications</h3>
+    </div>
+    <div class="card-body">
+        {% if applications %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Company</th>
+                        <th scope="col">Job Title</th>
+                        <th scope="col">Date Applied</th>
+                        <th scope="col" class="text-center">Status</th>
+                        <th scope="col" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td class="fw-bold">{{ app.job.company.name }}</td>
+                        <td>{{ app.job.title }}</td>
+                        <td>{{ app.applied_at|date:"F d, Y" }}</td>
+                        <td class="text-center">
+                            {% if app.status == 'Shortlisted' or app.status == 'Offered' %}
+                                <span class="badge rounded-pill bg-success p-2">{{ app.status }}</span>
+                            {% elif app.status == 'Rejected' %}
+                                <span class="badge rounded-pill bg-danger p-2">{{ app.status }}</span>
+                            {% elif app.status == 'Interview' %}
+                                <span class="badge rounded-pill bg-info p-2">{{ app.status }}</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-secondary p-2">{{ app.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'core:job_detail' app.job.id %}" class="btn btn-sm btn-outline-primary">View Job Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center p-5">
+            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+            <p class="lead">You haven't applied to any jobs yet.</p>
+            <a href="{% url 'core:job_listings' %}" class="btn btn-primary mt-2">Find Jobs to Apply For</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

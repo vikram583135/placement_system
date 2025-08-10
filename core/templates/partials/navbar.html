@@ -1,0 +1,73 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="{% url 'core:home' %}">
+            <i class="fas fa-graduation-cap me-2"></i>
+            PlacementPro
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="main-nav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:about' %}">About</a>
+                </li>
+                {% if user.is_authenticated and user.role == 'student' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:job_listings' %}">Find Jobs</a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>
+                            Hello, {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            {% if user.role == 'admin' %}
+                                <li><a class="dropdown-item" href="{% url 'core:admin_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2"></i>Admin Dashboard</a></li>
+                            {% elif user.role == 'student' %}
+                                <li><a class="dropdown-item" href="{% url 'core:student_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2"></i>Student Dashboard</a></li>
+                            {% elif user.role == 'company' %}
+                                <li><a class="dropdown-item" href="{% url 'core:company_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2"></i>Company Dashboard</a></li>
+                            {% endif %}
+                            
+                            {% if user.role == 'student' %}
+                                <li><a class="dropdown-item" href="{% url 'core:student_profile' %}"><i class="fas fa-user-edit fa-fw me-2"></i>My Profile</a></li>
+                            {% elif user.role == 'company' %}
+                                <li><a class="dropdown-item" href="{% url 'core:company_profile' %}"><i class="fas fa-id-card fa-fw me-2"></i>Company Profile</a></li>
+                            {% endif %}
+                            
+                            <li><a class="dropdown-item" href="{% url 'core:notifications' %}"><i class="fas fa-bell fa-fw me-2"></i>Notifications</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'core:logout' %}">
+                                    <i class="fas fa-sign-out-alt fa-fw me-2"></i>Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'core:login' %}" class="btn btn-outline-primary me-2">Login</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="btn btn-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Register
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'core:register_student' %}">As a Student</a></li>
+                            <li><a class="dropdown-item" href="{% url 'core:register_company' %}">As a Company</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

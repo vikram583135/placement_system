@@ -1,0 +1,154 @@
+/* static/css/style.css */
+
+/* 1. Google Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* 2. General Body & Layout Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa; /* A light grey background for pages */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1; /* Ensures the main content area grows to push the footer down */
+}
+
+a {
+    transition: color 0.2s ease-in-out;
+}
+
+/* 3. Component Styling (Navbar, Footer, Cards, Buttons) */
+
+/* Navbar with a subtle shadow */
+.navbar {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+}
+
+/* Main Footer Styling */
+.footer {
+    background-color: #212529; /* A dark footer */
+    color: white;
+    padding: 40px 0;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.07);
+}
+
+.footer a {
+    color: #adb5bd;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Interactive Cards */
+.card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+
+/* Button hover effect */
+.btn-primary {
+    transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+
+/* 4. Page-Specific & Section Styling */
+
+/* Home Page Hero Section */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2084&auto=format&fit=crop') no-repeat center center;
+    background-size: cover;
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
+
+/* Icons used in feature sections */
+.feature-icon {
+    font-size: 3rem;
+    color: #0d6efd; /* Bootstrap Primary Blue */
+}
+
+/* For Home page feature list */
+.icon-square {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+}
+
+
+/* 5. Panel & Sidebar Layout (Consolidated from base templates) */
+
+.panel-wrapper {
+    display: flex;
+}
+
+.sidebar-wrapper {
+    min-height: calc(100vh - 56px); /* Adjust 56px based on your navbar height */
+    width: 250px;
+    transition: margin .25s ease-out;
+}
+
+.page-content-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Active state for sidebar links */
+.sidebar-wrapper .list-group-item.active {
+    background-color: #0d6efd !important;
+    color: white !important;
+    border-color: #0d6efd !important;
+    font-weight: 600;
+}
+
+/* Dark theme for Admin sidebar */
+.sidebar-wrapper.bg-dark .list-group-item-dark {
+    background-color: #212529;
+    color: #adb5bd;
+    border-color: #32383e;
+}
+
+.sidebar-wrapper.bg-dark .list-group-item-dark:hover,
+.sidebar-wrapper.bg-dark .list-group-item-dark:focus {
+    background-color: #32383e;
+    color: #fff;
+}
+
+
+/* 6. Utility Styles (Chat, Funnel, etc.) */
+
+/* Chat status indicators */
+.chat-online { color: #28a745; } /* Green */
+.chat-offline { color: #6c757d; } /* Grey */
+
+/* Chat Messages */
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Analytics Funnel Chart styling */
+.funnel-stage {
+    transition: transform 0.2s ease-in-out;
+}
+.funnel-stage:hover {
+    transform: scale(1.02);
+}

@@ -1,0 +1,30 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block admin_content %}
+<div class="card shadow-sm">
+    <div class="card-header"><h3 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Global Interview Management</h3></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr><th>Date & Time</th><th>Company</th><th>Job Title</th><th>Student Name</th><th>Round</th></tr>
+                </thead>
+                <tbody>
+                    {% for interview in interviews_page_obj %}
+                    <tr>
+                        <td class="fw-bold">{{ interview.interview_date|date:"M d, Y" }}, {{ interview.interview_time|time:"h:i A" }}</td>
+                        <td>{{ interview.application.job.company.name }}</td>
+                        <td>{{ interview.application.job.title }}</td>
+                        <td>{{ interview.application.student.user.get_full_name }}</td>
+                        <td><span class="badge bg-primary">{{ interview.round_name }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center p-4">No interviews have been scheduled.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination Controls -->
+    </div>
+</div>
+{% endblock %}

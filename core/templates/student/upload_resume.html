@@ -1,0 +1,40 @@
+{% extends 'student/student_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block student_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-file-upload me-2"></i>Manage Your Resume</h3>
+            </div>
+            <div class="card-body">
+                {% if student_profile.resume %}
+                <div class="alert alert-success">
+                    <h5 class="alert-heading">Your resume is on file!</h5>
+                    <p>Current file: <strong>{{ student_profile.resume.name|cut:'resumes/' }}</strong></p>
+                    <hr>
+                    <a href="{{ student_profile.resume.url }}" class="btn btn-sm btn-outline-success" target="_blank"><i class="fas fa-eye me-2"></i>View Current Resume</a>
+                </div>
+                {% else %}
+                <div class="alert alert-danger">
+                    <h5 class="alert-heading">No Resume Found!</h5>
+                    <p>Please upload your resume. A resume is required to apply for most jobs. Accepted formats: PDF, DOCX.</p>
+                </div>
+                {% endif %}
+                
+                <h4 class="mt-4">{% if student_profile.resume %}Replace Your Resume{% else %}Upload Your Resume{% endif %}</h4>
+                <p class="text-muted">Please upload your resume in PDF or DOCX format (Max size: 5MB).</p>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-3">
+                        <i class="fas fa-upload me-2"></i>Upload File
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

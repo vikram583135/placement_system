@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home | Placement Pro{% endblock %}
+
+{% block content %}
+<!-- Main Hero Section -->
+<div class="container col-xxl-8 px-4 py-5">
+    <!-- ADDED WRAPPER: This new div will have the containerized background -->
+    <div class="content-container p-5">
+        <div class="row flex-lg-row-reverse align-items-center g-5">
+            <div class="col-10 col-sm-8 col-lg-6">
+                <img src="{% static 'images/LOGO1.jpg' %}" class="d-block mx-lg-auto img-fluid" alt="Team discussing work" width="700" height="500" loading="lazy">
+            </div>
+            <div class="col-lg-6">
+                <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Streamline Your Campus Placements</h1>
+                <p class="lead">An all-in-one platform connecting talented students with top-tier companies, managed seamlessly by your institution's placement cell. Automate, track, and succeed.</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <a href="#features" class="btn btn-primary btn-lg px-4 me-md-2">Explore Features</a>
+                    <a href="{% url 'core:login' %}" class="btn btn-outline-secondary btn-lg px-4">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container px-4 py-5" id="features">
+    <!-- ADDED WRAPPER: This new div will have the containerized background -->
+    <div class="content-container p-5">
+        <h2 class="pb-2 border-bottom text-center fw-bold">A Tailored Experience for Everyone</h2>
+        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+            <div class="col d-flex align-items-start">
+                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                    <i class="fas fa-user-graduate text-primary"></i>
+                </div>
+                <div>
+                    <h3 class="fs-2 text-body-emphasis">For Students</h3>
+                    <p>Build your profile, browse eligible jobs, apply with a single click, and track your interview schedules all in one place. Your dream job is just a few clicks away.</p>
+                </div>
+            </div>
+            <div class="col d-flex align-items-start">
+                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                    <i class="fas fa-building text-success"></i>
+                </div>
+                <div>
+                    <h3 class="fs-2 text-body-emphasis">For Companies</h3>
+                    <p>Publish job openings with specific criteria, view applications from top talent, shortlist candidates, and manage the entire interview process efficiently.</p>
+                </div>
+            </div>
+            <div class="col d-flex align-items-start">
+                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                    <i class="fas fa-user-shield text-danger"></i>
+                </div>
+                <div>
+                    <h3 class="fs-2 text-body-emphasis">For Admins</h3>
+                    <p>Oversee the entire placement ecosystem from a powerful dashboard. Manage users, approve jobs, and generate insightful reports to track placement success.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    body {
+        background-image: url("{% static 'images/LOGO.jpg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+    }
+
+    /* NEW STYLING FOR CONTENT CONTAINERS
+      This creates the "frosted glass" effect.
+    */
+    .content-container {
+        background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+        backdrop-filter: blur(10px); /* This creates the blur effect */
+        -webkit-backdrop-filter: blur(10px); /* For Safari compatibility */
+        border-radius: 1rem; /* Rounded corners */
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Subtle shadow */
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+</style>
+{% endblock %}

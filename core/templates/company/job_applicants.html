@@ -1,0 +1,88 @@
+{% extends 'company/company_base.html' %}
+
+{% block company_content %}
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="mb-0"><i class="fas fa-users me-2"></i>Applicants for: {{ job.title }}</h3>
+    </div>
+    <div class="card-body">
+        
+        <form method="post"> <!-- Form for bulk actions -->
+        {% csrf_token %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <label for="bulkAction" class="form-label me-2">With selected:</label>
+                <select class="form-select d-inline-block w-auto me-2" name="action" id="bulkAction">
+                    <option value="shortlist">Shortlist</option>
+                    <option value="reject">Reject</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th><input class="form-check-input" type="checkbox" id="selectAll"></th>
+                        <th>Student Name</th>
+                        <th class="text-center">Resume</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in applications %}
+                    <tr>
+                        <td><input class="form-check-input" type="checkbox" name="selected_applications" value="{{ application.id }}"></td>
+                        <td class="fw-bold">{{ application.student.user.get_full_name }}</td>
+                        <td class="text-center">
+                            {% if application.student.resume %}
+                                <a href="{{ application.student.resume.url }}" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fas fa-file-pdf"></i> View</a>
+                            {% else %}
+                                <span class="text-muted small">No Resume</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                             {% if application.status == 'Offered' %}<span class="badge bg-success p-2">Offered</span>
+                             {% elif application.status == 'Shortlisted' %}<span class="badge bg-info p-2">Shortlisted</span>
+                             {% elif application.status == 'Rejected' %}<span class="badge bg-danger p-2">Rejected</span>
+                             {% else %}<span class="badge bg-secondary p-2">{{ application.status }}</span>{% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <!-- The "Make Offer" button is added here -->
+                                {% if application.status == 'Shortlisted' or application.status == 'Interview' %}
+                                    <form method="post" action="{% url 'core:offer_candidate' job_id=job.id application_id=application.id %}" onsubmit="return confirm('Are you sure you want to extend an offer to this candidate? This will mark them as placed.');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success" title="Make Offer"><i class="fas fa-trophy"></i></button>
+                                    </form>
+                                {% endif %}
+
+                                <a href="?action=shortlist&app_id={{ application.id }}" class="btn btn-sm btn-outline-info" title="Shortlist"><i class="fas fa-check"></i></a>
+                                <a href="?action=reject&app_id={{ application.id }}" class="btn btn-sm btn-outline-danger" title="Reject"><i class="fas fa-times"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center p-4">No applications received for this job yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </form>
+         <a href="{% url 'core:schedule_interview' job.id %}" class="btn btn-info mt-3"><i class="fas fa-calendar-plus me-2"></i>Schedule Interview for Shortlisted</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.getElementById('selectAll').onclick = function() {
+        var checkboxes = document.getElementsByName('selected_applications');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    }
+</script>
+{% endblock %}

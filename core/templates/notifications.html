@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{# 
+    Note: This template extends 'base.html' directly. For a more integrated
+    experience, you might want a more complex view that determines whether to extend 
+    'student/student_base.html', 'company/company_base.html', etc., based on user role.
+    But for now, this will work perfectly.
+#}
+
+{% block title %}Notifications | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold"><i class="fas fa-bell me-2"></i>Notifications</h1>
+        <div class="btn-group" role="group">
+            <button class="btn btn-sm btn-outline-primary">Mark all as read</button>
+            <button class="btn btn-sm btn-outline-danger">Clear all</button>
+        </div>
+    </div>
+
+    <div class="list-group shadow-sm">
+        <a href="#" class="list-group-item list-group-item-action list-group-item-primary" aria-current="true">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1"><i class="fas fa-check-circle me-2"></i>Application Shortlisted</h5>
+                <small>15 minutes ago</small>
+            </div>
+            <p class="mb-1">Congratulations! Your application for the <strong>Software Engineer</strong> role at <strong>Google</strong> has been shortlisted.</p>
+            <small class="text-muted">Next step: Interview scheduling.</small>
+        </a>
+
+        <a href="#" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1"><i class="fas fa-briefcase text-primary me-2"></i>New Job Posted</h5>
+                <small class="text-muted">3 days ago</small>
+            </div>
+            <p class="mb-1"><strong>Microsoft</strong> has posted a new job opening for a <strong>Product Manager</strong> that matches your profile.</p>
+        </a>
+
+        <a href="#" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1"><i class="fas fa-calendar-alt text-success me-2"></i>Interview Scheduled</h5>
+                <small class="text-muted">5 days ago</small>
+            </div>
+            <p class="mb-1">An interview has been scheduled with <strong>Amazon</strong> for the <strong>Data Analyst</strong> position on <strong>June 20, 2025</strong>.</p>
+        </a>
+        
+        {% if not notifications %}
+            <div class="list-group-item text-center p-5 text-muted">
+                 <i class="fas fa-bell-slash fa-3x mb-3"></i>
+                <h4>No notifications yet.</h4>
+                <p>We'll let you know when something important happens.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

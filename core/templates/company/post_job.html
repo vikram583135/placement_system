@@ -1,0 +1,52 @@
+{% extends 'company/company_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block company_content %}
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="mb-0">
+            {% if form.instance.pk %}
+                <i class="fas fa-edit me-2"></i>Edit Job Posting
+            {% else %}
+                <i class="fas fa-plus-circle me-2"></i>Create a New Job Posting
+            {% endif %}
+        </h3>
+    </div>
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <fieldset class="border p-4 rounded mb-4">
+                <legend class="w-auto px-2 h6 fw-bold">Basic Information</legend>
+                {{ form.title|as_crispy_field }}
+                <div class="row">
+                    <div class="col-md-6">{{ form.location|as_crispy_field }}</div>
+                    <div class="col-md-6">{{ form.salary_range|as_crispy_field }}</div>
+                </div>
+                {{ form.description|as_crispy_field }}
+            </fieldset>
+
+            <fieldset class="border p-4 rounded mb-4">
+                <legend class="w-auto px-2 h6 fw-bold">Eligibility Criteria</legend>
+                <p class="text-muted small">Set the requirements students must meet to apply. These filters will be applied automatically.</p>
+                <div class="row">
+                    <div class="col-md-4">{{ form.min_cgpa|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form.max_backlogs|as_crispy_field }}</div>
+                    <div class="col-md-4">{{ form.application_deadline|as_crispy_field }}</div>
+                </div>
+                 {{ form.allowed_branches|as_crispy_field }}
+            </fieldset>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    {% if form.instance.pk %}
+                        <i class="fas fa-save me-2"></i>Update Job
+                    {% else %}
+                        <i class="fas fa-paper-plane me-2"></i>Post Job
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

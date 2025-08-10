@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container text-center py-5 my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <img src="{% static 'images/404-illustration.svg' %}" class="img-fluid mb-4" alt="Page Not Found" style="max-height: 300px;">
+            <h1 class="display-1 fw-bold text-primary">404</h1>
+            <h2 class="fw-bold">Oops! The page you're looking for doesn't exist.</h2>
+            <p class="lead text-muted my-3">
+                You may have mistyped the address, or the page may have moved.
+            </p>
+            <div class="mt-4">
+                <a href="{% url 'core:home' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home me-2"></i>Go to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

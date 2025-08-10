@@ -1,0 +1,54 @@
+{% extends 'admin/admin_base.html' %}
+{% load static %}
+
+{% block admin_content %}
+<h1 class="fw-bold mb-4"><i class="fas fa-chart-line me-2"></i>Advanced Analytics</h1>
+<div class="row g-4">
+    <div class="col-lg-12">
+        <div class="card shadow-sm"><div class="card-header"><h5 class="mb-0">Placement Rate by Branch</h5></div>
+            <div class="card-body"><canvas id="branchPlacementChart" style="min-height:350px;"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm"><div class="card-header"><h5 class="mb-0">Top Company Engagement</h5></div>
+            <div class="card-body"><canvas id="companyJobsChart"></canvas></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Data is now passed securely from the Django view
+    const branchLabels = JSON.parse('{{ branch_labels|escapejs }}');
+    const branchTotalData = JSON.parse('{{ branch_total_data|escapejs }}');
+    const branchPlacedData = JSON.parse('{{ branch_placed_data|escapejs }}');
+    
+    const companyLabels = JSON.parse('{{ company_labels|escapejs }}');
+    const companyJobCounts = JSON.parse('{{ company_job_counts|escapejs }}');
+
+    // 1. Placement Rate by Branch Chart
+    new Chart(document.getElementById('branchPlacementChart'), {
+        type: 'bar',
+        data: {
+            labels: branchLabels,
+            datasets: [
+                { label: 'Total Students', data: branchTotalData, backgroundColor: 'rgba(0, 123, 255, 0.5)' },
+                { label: 'Placed Students', data: branchPlacedData, backgroundColor: 'rgba(25, 135, 84, 0.7)' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // 2. Company Engagement Chart
+    new Chart(document.getElementById('companyJobsChart'), {
+        type: 'bar',
+        data: {
+            labels: companyLabels,
+            datasets: [{ label: 'Jobs Posted', data: companyJobCounts, backgroundColor: 'rgba(23, 162, 184, 0.6)' }]
+        },
+        options: { indexAxis: 'y', responsive: true }
+    });
+</script>
+{% endblock %}

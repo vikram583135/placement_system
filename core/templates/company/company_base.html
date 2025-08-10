@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Company Panel | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="d-flex" id="companyPanelWrapper">
+    <div class="bg-light border-end" id="sidebar-wrapper">
+        <div class="sidebar-heading border-bottom bg-white fw-bold text-primary">
+            <i class="fas fa-building me-2"></i>Company Panel
+        </div>
+        <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'company_dashboard' %}active{% endif %}" href="{% url 'core:company_dashboard' %}">
+                <i class="fas fa-tachometer-alt fa-fw me-3"></i>Dashboard
+            </a>
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'company_profile' %}active{% endif %}" href="{% url 'core:company_profile' %}">
+                <i class="fas fa-id-card fa-fw me-3"></i>Company Profile
+            </a>
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'post_job' %}active{% endif %}" href="{% url 'core:post_job' %}">
+                <i class="fas fa-plus-circle fa-fw me-3"></i>Post a New Job
+            </a>
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.resolver_match.url_name == 'posted_jobs' %}active{% endif %}" href="{% url 'core:posted_jobs' %}">
+                <i class="fas fa-list-alt fa-fw me-3"></i>Manage Jobs
+            </a>
+            <a class="list-group-item list-group-item-action list-group-item-light p-3 {% if 'interview' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'core:company_interview_schedules' %}">
+                <i class="fas fa-calendar-check fa-fw me-3"></i>Interview Schedules
+            </a>
+        </div>
+    </div>
+
+    <div id="page-content-wrapper">
+        <div class="container-fluid p-4">
+            {% block company_content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    #companyPanelWrapper {
+        display: flex;
+    }
+    #sidebar-wrapper {
+        min-height: calc(100vh - 56px); /* Adjust 56px based on your navbar height */
+        width: 250px;
+        transition: margin .25s ease-out;
+    }
+    #page-content-wrapper {
+        flex: 1;
+        min-width: 0;
+        background-color: #f8f9fa;
+    }
+    .list-group-item.active {
+        background-color: #0d6efd !important;
+        color: white !important;
+        border-color: #0d6efd !important;
+    }
+</style>
+{% endblock %}

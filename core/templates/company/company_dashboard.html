@@ -1,0 +1,26 @@
+{% extends 'company/company_base.html' %}
+{% block company_content %}
+<h1 class="mt-4 fw-bold">Welcome, {{ request.user.company_profile.name }}</h1>
+<p class="text-muted">Here is an overview of your recruitment activities.</p>
+<div class="row g-4 mt-3">
+    <div class="col-xl-4 col-md-6"><div class="card text-white bg-info h-100 shadow"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div class="fs-1 fw-bold">{{ total_jobs_posted }}</div><i class="fas fa-briefcase fa-3x opacity-50"></i></div><div class="fs-6 mt-1">Active Jobs Posted</div></div><div class="card-footer d-flex align-items-center justify-content-between bg-info-subtle border-0"><a class="small text-white stretched-link text-decoration-none" href="{% url 'core:posted_jobs' %}">Manage Jobs</a><div class="small text-white"><i class="fas fa-angle-right"></i></div></div></div></div>
+    <div class="col-xl-4 col-md-6"><div class="card text-white bg-primary h-100 shadow"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div class="fs-1 fw-bold">{{ total_applications }}</div><i class="fas fa-users fa-3x opacity-50"></i></div><div class="fs-6 mt-1">Total Applications</div></div><div class="card-footer d-flex align-items-center justify-content-between bg-primary-subtle border-0"><a class="small text-white stretched-link text-decoration-none" href="{% url 'core:posted_jobs' %}">View All Applicants</a><div class="small text-white"><i class="fas fa-angle-right"></i></div></div></div></div>
+    <div class="col-xl-4 col-md-6"><div class="card text-white bg-success h-100 shadow"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div class="fs-1 fw-bold">{{ shortlisted_candidates }}</div><i class="fas fa-user-check fa-3x opacity-50"></i></div><div class="fs-6 mt-1">Candidates Shortlisted</div></div><div class="card-footer d-flex align-items-center justify-content-between bg-success-subtle border-0"><a class="small text-white stretched-link text-decoration-none" href="#">View Shortlists</a><div class="small text-white"><i class="fas fa-angle-right"></i></div></div></div></div>
+</div>
+<div class="row g-4 mt-4">
+    <div class="col-lg-7"><div class="card shadow-sm h-100"><div class="card-header"><i class="fas fa-list-alt me-2"></i><strong>Recently Posted Jobs</strong></div><div class="card-body">{% if recent_jobs %}<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Title</th><th>Applications</th><th>Deadline</th><th>Action</th></tr></thead><tbody>{% for job in recent_jobs %}<tr><td class="fw-bold">{{ job.title }}</td><td><span class="badge bg-primary">{{ job.applications.count }}</span></td><td>{{ job.application_deadline|date:"M d, Y" }}</td><td><a href="{% url 'core:job_applicants' job.id %}" class="btn btn-sm btn-outline-primary">View</a></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-center p-4"><p class="lead">You haven't posted any jobs yet.</p><a href="{% url 'core:post_job' %}" class="btn btn-primary">Post Your First Job</a></div>{% endif %}</div></div></div>
+    <div class="col-lg-5"><div class="card shadow-sm h-100"><div class="card-header"><i class="fas fa-chart-bar me-2"></i><strong>Applications per Job</strong></div><div class="card-body"><canvas id="applicationsChart"></canvas></div></div></div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const jobTitles = JSON.parse('{{ job_titles_json|escapejs }}');
+    const jobAppCounts = JSON.parse('{{ job_app_counts_json|escapejs }}');
+    new Chart(document.getElementById('applicationsChart'), {
+        type: 'bar',
+        data: { labels: jobTitles, datasets: [{ label: '# of Applications', data: jobAppCounts, backgroundColor: 'rgba(0, 123, 255, 0.5)', borderColor: 'rgba(0, 123, 255, 1)', borderWidth: 1 }] },
+        options: { scales: { y: { beginAtZero: true } } }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'student/student_base.html' %}
+
+{% block student_content %}
+<h2 class="fw-bold mb-4"><i class="fas fa-briefcase me-2"></i>Available Job Openings</h2>
+<div class="row">
+    <div class="col-lg-3"><div class="card shadow-sm mb-4 sticky-top" style="top: 20px;"><div class="card-header"><h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Jobs</h5></div><div class="card-body"><form method="get"><div class="mb-3"><label for="companyName" class="form-label fw-bold">Company Name</label><input type="text" class="form-control" name="company_name" id="companyName" value="{{ request.GET.company_name|default:'' }}"></div><div class="mb-3"><label for="jobTitle" class="form-label fw-bold">Job Title</label><input type="text" class="form-control" name="title" id="jobTitle" value="{{ request.GET.title|default:'' }}"></div><div class="d-grid"><button type="submit" class="btn btn-primary"><i class="fas fa-search me-2"></i>Apply Filters</button></div></form></div></div></div>
+    <div class="col-lg-9">
+        {% for job in eligible_jobs %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-body"><div class="row"><div class="col-md-8"><h4 class="card-title fw-bold text-primary">{{ job.title }}</h4><h6 class="card-subtitle mb-2 text-muted">{{ job.company.name }}</h6><p class="card-text mb-1"><span class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i>{{ job.location }}</span><span><i class="fas fa-money-bill-wave me-2 text-secondary"></i>{{ job.salary_range }}</span></p><p class="card-text"><small class="text-danger fw-bold">Apply Before: {{ job.application_deadline|date:"F d, Y" }}</small></p></div><div class="col-md-4 text-md-end align-self-center"><a href="{% url 'core:job_detail' job.id %}" class="btn btn-outline-primary mb-2 w-100">View Details</a>{% if job.has_applied %}<button class="btn btn-warning w-100" disabled><i class="fas fa-check-circle me-2"></i>Applied</button>{% else %}<form method="post" action="{% url 'core:apply_for_job' job.id %}" class="d-inline w-100">{% csrf_token %}<button type="submit" class="btn btn-success w-100">Apply Now</button></form>{% endif %}</div></div></div>
+        </div>
+        {% empty %}
+        <div class="card"><div class="card-body text-center p-5"><i class="fas fa-search-minus fa-3x text-muted mb-3"></i><p class="lead">No eligible job openings found that match your criteria.</p><p class="text-muted">Try adjusting your filters or check back later!</p></div></div>
+        {% endfor %}
+        
+        {% if ineligible_jobs %}
+            <h4 class="mt-5 text-muted">Jobs You Are Not Eligible For</h4>
+            {% for job in ineligible_jobs %}
+             <div class="card shadow-sm mb-3 bg-light"><div class="card-body opacity-50"><div class="row"><div class="col-md-8"><h5 class="card-title fw-bold text-secondary">{{ job.title }}</h5><h6 class="card-subtitle mb-2 text-muted">{{ job.company.name }}</h6></div><div class="col-md-4 text-md-end align-self-center"><a href="{% url 'core:job_detail' job.id %}" class="btn btn-sm btn-outline-secondary">View Details</a></div></div></div></div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

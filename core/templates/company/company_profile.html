@@ -1,0 +1,51 @@
+{% extends 'company/company_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block company_content %}
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="mb-0"><i class="fas fa-id-card me-2"></i>Edit Company Profile</h3>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">This information will be visible to students on job postings. Keep it accurate and appealing.</p>
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.name|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.website|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                {{ form.description|as_crispy_field }}
+            </div>
+            
+             <div class="mb-3">
+                <label class="form-label">Company Logo</label>
+                {% if company_profile.logo %}
+                    <p class="text-muted">Current Logo: <img src="{{ company_profile.logo.url }}" alt="{{ company_profile.name }} Logo" class="img-thumbnail" style="max-height: 50px;"></p>
+                {% endif %}
+                {{ form.logo }}
+            </div>
+            
+            <hr class="my-4">
+            <h5 class="mb-3 fw-bold">HR Contact Information</h5>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.hr_name|as_crispy_field }}
+                </div>
+                 <div class="col-md-6 mb-3">
+                    {{ form.hr_email|as_crispy_field }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save me-2"></i>Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
