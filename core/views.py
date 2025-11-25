@@ -1109,7 +1109,7 @@ def analytics_view(request):
     # 2. Top Companies by Jobs Posted
     top_companies = (
         CompanyProfile.objects
-        .annotate(job_count=Count('jobposting'))
+        .annotate(job_count=Count('jobs'))
         .filter(job_count__gt=0)
         .order_by('-job_count')[:10]
     )
