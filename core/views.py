@@ -379,13 +379,24 @@ def placement_status_view(request):
     
     if student_profile.is_placed:
         try:
-            # Find the application that led to the placement
-            placement_details = Application.objects.get(
+            # Find the application that led to the placement (status = 'Offered')
+            placement_details = Application.objects.select_related(
+                'job__company'
+            ).get(
                 student=student_profile, 
                 status='Offered'
             )
         except Application.DoesNotExist:
-            placement_details = None # Handle case where status might be inconsistent
+            # Handle case where status might be inconsistent
+            placement_details = None
+        except Application.MultipleObjectsReturned:
+            # If multiple offers exist, get the most recent one
+            placement_details = Application.objects.select_related(
+                'job__company'
+            ).filter(
+                student=student_profile, 
+                status='Offered'
+            ).order_by('-applied_at').first()
 
     context = {
         'student_profile': student_profile,
@@ -516,6 +527,27 @@ def job_applicants_view(request, job_id):
     """
     job = get_object_or_404(JobPosting, id=job_id, company=request.user.company_profile)
     
+    # Handle individual action buttons (GET requests)
+    if request.method == 'GET':
+        action = request.GET.get('action')
+        app_id = request.GET.get('app_id')
+        
+        if action and app_id:
+            try:
+                application = Application.objects.get(id=app_id, job=job)
+                if action == 'shortlist':
+                    application.status = 'Shortlisted'
+                    application.save()
+                    messages.success(request, f'{application.student.user.get_full_name()} has been shortlisted.')
+                elif action == 'reject':
+                    application.status = 'Rejected'
+                    application.save()
+                    messages.warning(request, f'{application.student.user.get_full_name()} has been rejected.')
+                return redirect('core:job_applicants', job_id=job.id)
+            except Application.DoesNotExist:
+                messages.error(request, 'Application not found.')
+    
+    # Handle bulk actions (POST requests)
     if request.method == 'POST':
         app_ids = request.POST.getlist('selected_applications')
         action = request.POST.get('action')
@@ -623,29 +655,47 @@ def offer_candidate_view(request, job_id, application_id):
     Handles the action of marking a candidate as 'Offered'.
     This view updates both the Application status and the Student's profile.
     """
-    # Get the specific application, ensuring it belongs to the current company
-    application = get_object_or_404(
-        Application, 
-        id=application_id, 
-        job__id=job_id,
-        job__company=request.user.company_profile
-    )
-    
-    # Get the related student profile
-    student_profile = application.student
-    
-    # Set the student's main profile status to placed
-    student_profile.is_placed = True
-    student_profile.save()
-    
-    # Update the application status to 'Offered'
-    application.status = 'Offered'
-    application.save()
-    
-    # (Optional but recommended) You could also change the status of all other
-    # 'Applied' or 'Shortlisted' applications from this student to 'Closed'.
-    
-    messages.success(request, f'An offer has been successfully extended to {student_profile.user.get_full_name()}!')
+    try:
+        # Get the specific application, ensuring it belongs to the current company
+        application = get_object_or_404(
+            Application, 
+            id=application_id, 
+            job__id=job_id,
+            job__company=request.user.company_profile
+        )
+        
+        # Get the related student profile
+        student_profile = application.student
+        
+        # Set the student's main profile status to placed
+        student_profile.is_placed = True
+        student_profile.save()
+        
+        # Update the application status to 'Offered'
+        application.status = 'Offered'
+        application.save()
+        
+        # Update all other applications for this student to 'Rejected' or keep them as is
+        # (Optional: You can reject other pending applications automatically)
+        Application.objects.filter(
+            student=student_profile
+        ).exclude(
+            id=application_id
+        ).exclude(
+            status__in=['Offered', 'Rejected']
+        ).update(status='Rejected')
+        
+        # Create audit log entry
+        AuditLog.objects.create(
+            user=request.user,
+            action=f'Extended offer to {student_profile.user.get_full_name()} for {application.job.title}'
+        )
+        
+        messages.success(request, f'An offer has been successfully extended to {student_profile.user.get_full_name()}!')
+        
+    except Exception as e:
+        messages.error(request, f'Error extending offer: {str(e)}')
+        print(f'ERROR in offer_candidate_view: {e}')  # This will appear in the terminal
     
     return redirect('core:job_applicants', job_id=job_id)
 

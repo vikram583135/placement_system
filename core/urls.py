@@ -48,10 +48,8 @@ urlpatterns = [
     path('company/jobs/<int:job_id>/applicants/', views.job_applicants_view, name='job_applicants'),
     path('company/jobs/<int:job_id>/shortlist-candidate/<int:application_id>/', views.shortlist_candidate_view, name='shortlist_candidate'),
     path('company/jobs/<int:job_id>/schedule-interviews/', views.schedule_interview_view, name='schedule_interview'),
-    # In core/urls.py, inside urlpatterns:
     path('company/interviews/', views.company_interview_schedules_view, name='company_interview_schedules'),
     path('company/jobs/<int:job_id>/offer/<int:application_id>/', views.offer_candidate_view, name='offer_candidate'),
-    path('company/jobs/<int:job_id>/schedule-interviews/', views.schedule_interview_view, name='schedule_interview'),
 
 
    # core/urls.py (snippet)
