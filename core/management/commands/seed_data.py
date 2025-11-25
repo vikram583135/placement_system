@@ -256,11 +256,15 @@ class Command(BaseCommand):
         
         if options['clear']:
             self.clear_data()
-        elif User.objects.filter(role='student').exists():
-            self.stdout.write(self.style.WARNING('\nData already exists!'))
-            self.stdout.write(self.style.WARNING('Use --clear flag to remove existing data and reseed.'))
-            self.stdout.write("Seeding cancelled.")
-            return
+        else:
+            if User.objects.filter(role='student').exists():
+                self.stdout.write(self.style.WARNING('\nData already exists!'))
+                response = input("Clear and reseed? (yes/no): ")
+                if response.lower() == 'yes':
+                    self.clear_data()
+                else:
+                    self.stdout.write("Seeding cancelled.")
+                    return
         
         try:
             self.seed_admins()
