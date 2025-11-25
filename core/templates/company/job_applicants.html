@@ -59,15 +59,14 @@
                             <td class="text-center">
                                 <div class="btn-group">
                                     {% if application.status == 'Shortlisted' or application.status == 'Interview' %}
-                                    <form method="post"
-                                        action="{% url 'core:offer_candidate' job_id=job.id application_id=application.id %}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Are you sure you want to extend an offer to this candidate? This will mark them as placed.');">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-success" title="Make Offer">
-                                            <i class="fas fa-trophy"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" 
+                                        class="btn btn-sm btn-success offer-btn" 
+                                        data-job-id="{{ job.id }}"
+                                        data-application-id="{{ application.id }}"
+                                        data-student-name="{{ application.student.user.get_full_name }}"
+                                        title="Make Offer">
+                                        <i class="fas fa-trophy"></i>
+                                    </button>
                                     {% endif %}
 
                                     <a href="?action=shortlist&app_id={{ application.id }}"
@@ -88,6 +87,19 @@
                 </table>
             </div>
         </form>
+        
+        <!-- Hidden forms for offer actions (outside nested form structure) -->
+        {% for application in applications %}
+        {% if application.status == 'Shortlisted' or application.status == 'Interview' %}
+        <form method="post" 
+              id="offer-form-{{ application.id }}"
+              action="{% url 'core:offer_candidate' job_id=job.id application_id=application.id %}"
+              style="display: none;">
+            {% csrf_token %}
+        </form>
+        {% endif %}
+        {% endfor %}
+        
         <a href="{% url 'core:schedule_interview' job.id %}" class="btn btn-info mt-3"><i
                 class="fas fa-calendar-plus me-2"></i>Schedule Interview for Shortlisted</a>
     </div>
@@ -96,11 +108,31 @@
 
 {% block extra_scripts %}
 <script>
+    // Select all checkbox functionality
     document.getElementById('selectAll').onclick = function () {
         var checkboxes = document.getElementsByName('selected_applications');
         for (var checkbox of checkboxes) {
             checkbox.checked = this.checked;
         }
     }
+    
+    // Make Offer button functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.offer-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var studentName = this.getAttribute('data-student-name');
+                var applicationId = this.getAttribute('data-application-id');
+                
+                if (confirm('Are you sure you want to extend an offer to ' + studentName + '? This will mark them as placed.')) {
+                    var form = document.getElementById('offer-form-' + applicationId);
+                    if (form) {
+                        form.submit();
+                    } else {
+                        console.error('Form not found for application ID: ' + applicationId);
+                    }
+                }
+            });
+        });
+    });
 </script>
 {% endblock %}
