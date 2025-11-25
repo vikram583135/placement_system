@@ -3,52 +3,403 @@
 
 {% block admin_content %}
 <h1 class="fw-bold mb-4"><i class="fas fa-chart-line me-2"></i>Advanced Analytics</h1>
-<div class="row g-4">
-    <div class="col-lg-12">
-        <div class="card shadow-sm"><div class="card-header"><h5 class="mb-0">Placement Rate by Branch</h5></div>
-            <div class="card-body"><canvas id="branchPlacementChart" style="min-height:350px;"></canvas></div>
+
+<!-- Summary Statistics Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-primary">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                <h3 class="mb-0">{{ total_students }}</h3>
+                <p class="text-muted mb-0">Total Students</p>
+            </div>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-success">
+            <div class="card-body text-center">
+                <i class="fas fa-user-check fa-2x text-success mb-2"></i>
+                <h3 class="mb-0">{{ placed_students }}</h3>
+                <p class="text-muted mb-0">Placed Students</p>
+                <small class="text-success fw-bold">{{ placement_percentage }}%</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-info">
+            <div class="card-body text-center">
+                <i class="fas fa-building fa-2x text-info mb-2"></i>
+                <h3 class="mb-0">{{ total_companies }}</h3>
+                <p class="text-muted mb-0">Active Companies</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-warning">
+            <div class="card-body text-center">
+                <i class="fas fa-briefcase fa-2x text-warning mb-2"></i>
+                <h3 class="mb-0">{{ total_jobs }}</h3>
+                <p class="text-muted mb-0">Job Postings</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row g-4">
+    <!-- Placement Rate by Branch -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Placement Rate by Branch</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="branchPlacementChart" style="min-height:350px;"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Application Status Distribution -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Application Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Companies by Jobs Posted -->
     <div class="col-lg-6">
-        <div class="card shadow-sm"><div class="card-header"><h5 class="mb-0">Top Company Engagement</h5></div>
-            <div class="card-body"><canvas id="companyJobsChart"></canvas></div>
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-building me-2"></i>Top Companies by Job Postings</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="companyJobsChart" style="min-height:300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monthly Application Trends -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Application Trends (6 Months)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" style="min-height:300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CGPA Distribution -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-star me-2"></i>CGPA Distribution (Placed vs Not Placed)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="cgpaChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Interview Conversion Funnel -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Interview Conversion Funnel</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="funnelChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
+
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Data is now passed securely from the Django view
+    // Parse data from Django view
     const branchLabels = JSON.parse('{{ branch_labels|escapejs }}');
     const branchTotalData = JSON.parse('{{ branch_total_data|escapejs }}');
     const branchPlacedData = JSON.parse('{{ branch_placed_data|escapejs }}');
     
     const companyLabels = JSON.parse('{{ company_labels|escapejs }}');
     const companyJobCounts = JSON.parse('{{ company_job_counts|escapejs }}');
+    
+    const statusLabels = JSON.parse('{{ status_labels|escapejs }}');
+    const statusCounts = JSON.parse('{{ status_counts|escapejs }}');
+    
+    const trendLabels = JSON.parse('{{ trend_labels|escapejs }}');
+    const trendCounts = JSON.parse('{{ trend_counts|escapejs }}');
+    
+    const cgpaLabels = JSON.parse('{{ cgpa_labels|escapejs }}');
+    const cgpaPlaced = JSON.parse('{{ cgpa_placed|escapejs }}');
+    const cgpaNotPlaced = JSON.parse('{{ cgpa_not_placed|escapejs }}');
+    
+    const interviewStatuses = JSON.parse('{{ interview_statuses|escapejs }}');
+    const interviewCounts = JSON.parse('{{ interview_counts|escapejs }}');
 
-    // 1. Placement Rate by Branch Chart
+    // 1. Placement Rate by Branch Chart (Grouped Bar)
     new Chart(document.getElementById('branchPlacementChart'), {
         type: 'bar',
         data: {
             labels: branchLabels,
             datasets: [
-                { label: 'Total Students', data: branchTotalData, backgroundColor: 'rgba(0, 123, 255, 0.5)' },
-                { label: 'Placed Students', data: branchPlacedData, backgroundColor: 'rgba(25, 135, 84, 0.7)' }
+                { 
+                    label: 'Total Students', 
+                    data: branchTotalData, 
+                    backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                },
+                { 
+                    label: 'Placed Students', 
+                    data: branchPlacedData, 
+                    backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 1
+                }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Branch-wise Placement Statistics'
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Students'
+                    }
+                }
+            }
+        }
     });
 
-    // 2. Company Engagement Chart
+    // 2. Application Status Distribution (Pie Chart)
+    const statusColors = {
+        'Applied': 'rgba(0, 123, 255, 0.8)',
+        'Shortlisted': 'rgba(255, 193, 7, 0.8)',
+        'Rejected': 'rgba(220, 53, 69, 0.8)',
+        'Interview': 'rgba(23, 162, 184, 0.8)',
+        'Offered': 'rgba(25, 135, 84, 0.8)'
+    };
+    
+    const statusBgColors = statusLabels.map(label => statusColors[label] || 'rgba(108, 117, 125, 0.8)');
+    
+    new Chart(document.getElementById('statusPieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusCounts,
+                backgroundColor: statusBgColors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: { 
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 3. Top Companies by Jobs Posted (Horizontal Bar)
     new Chart(document.getElementById('companyJobsChart'), {
         type: 'bar',
         data: {
             labels: companyLabels,
-            datasets: [{ label: 'Jobs Posted', data: companyJobCounts, backgroundColor: 'rgba(23, 162, 184, 0.6)' }]
+            datasets: [{ 
+                label: 'Jobs Posted', 
+                data: companyJobCounts, 
+                backgroundColor: 'rgba(23, 162, 184, 0.7)',
+                borderColor: 'rgba(23, 162, 184, 1)',
+                borderWidth: 1
+            }]
         },
-        options: { indexAxis: 'y', responsive: true }
+        options: { 
+            indexAxis: 'y', 
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Jobs'
+                    }
+                }
+            }
+        }
+    });
+
+    // 4. Monthly Application Trends (Line Chart)
+    new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+            labels: trendLabels,
+            datasets: [{
+                label: 'Applications',
+                data: trendCounts,
+                backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                borderColor: 'rgba(255, 193, 7, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'rgba(255, 193, 7, 1)',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Applications'
+                    }
+                }
+            }
+        }
+    });
+
+    // 5. CGPA Distribution (Stacked Bar Chart)
+    new Chart(document.getElementById('cgpaChart'), {
+        type: 'bar',
+        data: {
+            labels: cgpaLabels,
+            datasets: [
+                {
+                    label: 'Placed',
+                    data: cgpaPlaced,
+                    backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Not Placed',
+                    data: cgpaNotPlaced,
+                    backgroundColor: 'rgba(108, 117, 125, 0.5)',
+                    borderColor: 'rgba(108, 117, 125, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Student Distribution by CGPA Range'
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'CGPA Range'
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Students'
+                    }
+                }
+            }
+        }
+    });
+
+    // 6. Interview Conversion Funnel (Bar Chart)
+    new Chart(document.getElementById('funnelChart'), {
+        type: 'bar',
+        data: {
+            labels: interviewStatuses,
+            datasets: [{
+                label: 'Candidates',
+                data: interviewCounts,
+                backgroundColor: [
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(23, 162, 184, 0.7)',
+                    'rgba(25, 135, 84, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(23, 162, 184, 1)',
+                    'rgba(25, 135, 84, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Recruitment Pipeline'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Candidates'
+                    }
+                }
+            }
+        }
     });
 </script>
 {% endblock %}

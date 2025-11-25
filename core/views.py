@@ -1069,5 +1069,150 @@ def view_resume_view(request, student_id):
 
 @login_required
 @admin_required
+@admin_required
 def analytics_view(request):
-    return render(request, 'admin/analytics.html')
+    """
+    Advanced Analytics Dashboard for Admin/TPO
+    Shows placement statistics, company engagement, and trends
+    """
+    from django.db.models import Count, Q
+    import json
+    
+    # 1. Placement Rate by Branch
+    branches = ['Computer Science Engineering', 'Electronics and Communication Engineering', 
+                'Mechanical Engineering', 'Electrical and Electronics Engineering', 
+                'Civil Engineering', 'Chemical Engineering']
+    
+    branch_labels = []
+    branch_total_data = []
+    branch_placed_data = []
+    
+    for branch in branches:
+        total = StudentProfile.objects.filter(branch=branch).count()
+        placed = StudentProfile.objects.filter(branch=branch, is_placed=True).count()
+        
+        if total > 0:  # Only include branches with students
+            # Use abbreviated names for better chart display
+            branch_short = {
+                'Computer Science Engineering': 'CSE',
+                'Electronics and Communication Engineering': 'ECE',
+                'Mechanical Engineering': 'ME',
+                'Electrical and Electronics Engineering': 'EEE',
+                'Civil Engineering': 'Civil',
+                'Chemical Engineering': 'Chemical'
+            }.get(branch, branch)
+            
+            branch_labels.append(branch_short)
+            branch_total_data.append(total)
+            branch_placed_data.append(placed)
+    
+    # 2. Top Companies by Jobs Posted
+    top_companies = (
+        CompanyProfile.objects
+        .annotate(job_count=Count('jobposting'))
+        .filter(job_count__gt=0)
+        .order_by('-job_count')[:10]
+    )
+    
+    company_labels = [company.name for company in top_companies]
+    company_job_counts = [company.job_count for company in top_companies]
+    
+    # 3. Application Status Distribution
+    application_statuses = Application.objects.values('status').annotate(count=Count('id'))
+    status_labels = [item['status'] for item in application_statuses]
+    status_counts = [item['count'] for item in application_statuses]
+    
+    # 4. Monthly Placement Trends (last 6 months)
+    from datetime import datetime, timedelta
+    from django.db.models.functions import TruncMonth
+    
+    six_months_ago = datetime.now() - timedelta(days=180)
+    
+    monthly_applications = (
+        Application.objects
+        .filter(applied_at__gte=six_months_ago)
+        .annotate(month=TruncMonth('applied_at'))
+        .values('month')
+        .annotate(count=Count('id'))
+        .order_by('month')
+    )
+    
+    trend_labels = [item['month'].strftime('%B %Y') for item in monthly_applications]
+    trend_counts = [item['count'] for item in monthly_applications]
+    
+    # 5. CGPA Distribution of Placed vs Non-Placed Students
+    cgpa_ranges = [
+        (6.0, 6.99, '6.0-6.9'),
+        (7.0, 7.99, '7.0-7.9'),
+        (8.0, 8.99, '8.0-8.9'),
+        (9.0, 10.0, '9.0-10.0')
+    ]
+    
+    cgpa_labels = [label for _, _, label in cgpa_ranges]
+    cgpa_placed = []
+    cgpa_not_placed = []
+    
+    for min_cgpa, max_cgpa, _ in cgpa_ranges:
+        placed = StudentProfile.objects.filter(
+            cgpa__gte=min_cgpa,
+            cgpa__lte=max_cgpa,
+            is_placed=True
+        ).count()
+        
+        not_placed = StudentProfile.objects.filter(
+            cgpa__gte=min_cgpa,
+            cgpa__lte=max_cgpa,
+            is_placed=False
+        ).count()
+        
+        cgpa_placed.append(placed)
+        cgpa_not_placed.append(not_placed)
+    
+    # 6. Interview Conversion Rates
+    interview_statuses = ['Shortlisted', 'Interview', 'Offered']
+    interview_counts = []
+    
+    for status in interview_statuses:
+        count = Application.objects.filter(status=status).count()
+        interview_counts.append(count)
+    
+    # Convert to JSON for safe template rendering
+    context = {
+        'branch_labels': json.dumps(branch_labels),
+        'branch_total_data': json.dumps(branch_total_data),
+        'branch_placed_data': json.dumps(branch_placed_data),
+        
+        'company_labels': json.dumps(company_labels),
+        'company_job_counts': json.dumps(company_job_counts),
+        
+        'status_labels': json.dumps(status_labels),
+        'status_counts': json.dumps(status_counts),
+        
+        'trend_labels': json.dumps(trend_labels),
+        'trend_counts': json.dumps(trend_counts),
+        
+        'cgpa_labels': json.dumps(cgpa_labels),
+        'cgpa_placed': json.dumps(cgpa_placed),
+        'cgpa_not_placed': json.dumps(cgpa_not_placed),
+        
+        'interview_statuses': json.dumps(interview_statuses),
+        'interview_counts': json.dumps(interview_counts),
+        
+        # Summary statistics
+        'total_students': StudentProfile.objects.count(),
+        'placed_students': StudentProfile.objects.filter(is_placed=True).count(),
+        'total_companies': CompanyProfile.objects.filter(is_approved=True).count(),
+        'total_jobs': JobPosting.objects.filter(is_approved=True).count(),
+        'total_applications': Application.objects.count(),
+        'total_interviews': InterviewSchedule.objects.count(),
+    }
+    
+    # Calculate placement percentage
+    if context['total_students'] > 0:
+        context['placement_percentage'] = round(
+            (context['placed_students'] / context['total_students']) * 100, 2
+        )
+    else:
+        context['placement_percentage'] = 0
+    
+    return render(request, 'admin/analytics.html', context)
