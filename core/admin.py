@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     User, StudentProfile, CompanyProfile, JobPosting,
-    Application, InterviewSchedule, Document, AuditLog
+    Application, InterviewSchedule, Document, AuditLog, Notification
 )
 
 
@@ -101,3 +101,10 @@ class AuditLogAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'action')
     date_hierarchy = 'timestamp'
     readonly_fields = ('user', 'action', 'timestamp')
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'message', 'notification_type', 'is_read', 'created_at')
+    list_filter = ('notification_type', 'is_read', 'created_at')
+    search_fields = ('user__username', 'message')
+    date_hierarchy = 'created_at'

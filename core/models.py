@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 # ==============================================================================
 # 1. Custom User Model
@@ -63,9 +64,22 @@ class JobPosting(models.Model):
     """
     Represents a job opening posted by a company.
     """
+    JOB_TYPE_CHOICES = (
+        ('Full-Time', 'Full-Time'),
+        ('Internship', 'Internship'),
+        ('Part-Time', 'Part-Time'),
+    )
+    EXPERIENCE_LEVEL_CHOICES = (
+        ('Entry Level', 'Entry Level'),
+        ('Mid Level', 'Mid Level'),
+        ('Senior', 'Senior'),
+    )
+
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE, related_name='jobs')
     title = models.CharField(max_length=200)
     description = models.TextField()
+    job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES, default='Full-Time')
+    experience_level = models.CharField(max_length=20, choices=EXPERIENCE_LEVEL_CHOICES, default='Entry Level')
     salary_range = models.CharField(max_length=100, blank=True)
     location = models.CharField(max_length=100)
     application_deadline = models.DateField()
@@ -92,6 +106,7 @@ class Application(models.Model):
     job = models.ForeignKey(JobPosting, on_delete=models.CASCADE, related_name='applications')
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='applications')
     applied_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Applied')
 
     class Meta:
@@ -125,6 +140,9 @@ class InterviewSchedule(models.Model):
     venue_or_link = models.CharField(max_length=255)
     additional_instructions = models.TextField(blank=True, help_text="Any additional instructions for the candidate.")
 
+    def __str__(self):
+        return f"Interview for {self.application.student.user.username} - {self.round_name}"
+
 class Document(models.Model):
     """
     For admins to upload documents like guidelines, templates, etc.
@@ -132,6 +150,9 @@ class Document(models.Model):
     title = models.CharField(max_length=200)
     file = models.FileField(upload_to='documents/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
 
 class AuditLog(models.Model):
     """
@@ -142,4 +163,32 @@ class AuditLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.action} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+        username = self.user.username if self.user else 'System'
+        return f"{username} - {self.action} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+# ==============================================================================
+# 5. Notification Model
+# ==============================================================================
+class Notification(models.Model):
+    """
+    Stores notifications for users across all roles.
+    """
+    NOTIFICATION_TYPE_CHOICES = (
+        ('info', 'Info'),
+        ('success', 'Success'),
+        ('warning', 'Warning'),
+        ('danger', 'Danger'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.CharField(max_length=500)
+    notification_type = models.CharField(max_length=10, choices=NOTIFICATION_TYPE_CHOICES, default='info')
+    is_read = models.BooleanField(default=False)
+    link = models.CharField(max_length=500, blank=True, help_text="Optional URL to redirect to when clicked.")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.notification_type}] {self.message[:50]} -> {self.user.username}"

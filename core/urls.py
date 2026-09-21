@@ -18,6 +18,7 @@ urlpatterns = [
     path('register/company/', views.company_register_view, name='register_company'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('password-change/', views.password_change_view, name='password_change'),
 
     # ==========================================================================
     # 2. Student Panel URLs

@@ -2,14 +2,14 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, FileResponse, Http404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .decorators import student_required, company_required, admin_required
 from .forms import (
     BulkUploadForm, StudentRegistrationForm, CompanyRegistrationForm,
     UserUpdateForm, StudentProfileForm, CompanyProfileForm,
-    JobPostingForm, ResumeUploadForm, InterviewScheduleForm
+    JobPostingForm, ResumeUploadForm, InterviewScheduleForm, PasswordChangeCustomForm
 )
 from django.contrib.auth.forms import AuthenticationForm
 from .models import (
@@ -102,8 +102,29 @@ def login_view(request):
 @login_required
 def logout_view(request):
     logout(request)
-    messages.info(request, "You have been successfully logged out.")
+    messages.info(request, "You have been logged out.")
     return redirect('core:home')
+
+@login_required
+def password_change_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeCustomForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important to keep user logged in
+            messages.success(request, 'Your password was successfully updated!')
+            # Redirect back to their dashboard depending on role
+            if user.role == 'student':
+                return redirect('core:student_dashboard')
+            elif user.role == 'company':
+                return redirect('core:company_dashboard')
+            else:
+                return redirect('core:admin_dashboard')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeCustomForm(request.user)
+    return render(request, 'auth/password_change.html', {'form': form})
 
 # ==============================================================================
 # 2. Student Panel Views
@@ -747,9 +768,30 @@ def admin_dashboard(request):
 @login_required
 @admin_required
 def manage_students_view(request):
-    # This view is already implemented correctly
     students_list = StudentProfile.objects.all().select_related('user').order_by('user__first_name')
-    # ... (filtering and pagination logic) ...
+    
+    # Search and Filter Logic
+    search_query = request.GET.get('search', '')
+    branch_filter = request.GET.get('branch', '')
+    placed_filter = request.GET.get('placed', '')
+
+    if search_query:
+        students_list = students_list.filter(
+            Q(user__first_name__icontains=search_query) |
+            Q(user__last_name__icontains=search_query) |
+            Q(user__email__icontains=search_query)
+        )
+    
+    if branch_filter:
+        students_list = students_list.filter(branch__iexact=branch_filter)
+        
+    if placed_filter == '1':
+        students_list = students_list.filter(is_placed=True)
+    elif placed_filter == '0':
+        students_list = students_list.filter(is_placed=False)
+
+    # Get distinct branches for filter dropdown
+    branches = StudentProfile.objects.values_list('branch', flat=True).distinct()
     paginator = Paginator(students_list, 15) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -760,9 +802,41 @@ def manage_students_view(request):
 @login_required
 @admin_required
 def manage_companies_view(request):
-    # This view is already implemented correctly
     companies_list = CompanyProfile.objects.all().select_related('user').order_by('name')
-    # ... (filtering and pagination logic) ...
+    
+    # Search and Filter Logic
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+
+    if search_query:
+        companies_list = companies_list.filter(
+            Q(name__icontains=search_query) |
+            Q(hr_name__icontains=search_query) |
+            Q(hr_email__icontains=search_query)
+        )
+    
+    if status_filter == '1':
+        companies_list = companies_list.filter(is_approved=True)
+    elif status_filter == '0':
+        companies_list = companies_list.filter(is_approved=False)
+
+    # Handle inline actions (approve/reject)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        company_id = request.POST.get('company_id')
+        if action and company_id:
+            try:
+                company = CompanyProfile.objects.get(user_id=company_id)
+                if action == 'approve':
+                    company.is_approved = True
+                    company.save()
+                    messages.success(request, f'Company "{company.name}" approved.')
+                elif action == 'reject':
+                    company.delete()  # Or set to rejected status depending on requirements
+                    messages.success(request, 'Company application rejected and removed.')
+                return redirect('core:manage_companies')
+            except CompanyProfile.DoesNotExist:
+                messages.error(request, 'Company not found.')
     paginator = Paginator(companies_list, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -1024,16 +1098,27 @@ def notifications_view(request):
     """
     Displays a list of notifications for the logged-in user.
     """
-    # TODO: Add logic here to fetch notification objects from the database
-    # that are specific to the request.user.
-    # For now, we will just pass an empty context.
-    
-    # Example logic you might add later:
-    # notifications = Notification.objects.filter(user=request.user).order_by('-timestamp')
-    # context = {'notifications': notifications}
-    
-    context = {} # Using an empty context for now
-    
+    from .models import Notification
+
+    # Handle "mark as read" action
+    if request.method == 'POST' and request.POST.get('action') == 'mark_read':
+        notif_id = request.POST.get('notification_id')
+        if notif_id:
+            try:
+                notif = Notification.objects.get(id=notif_id, user=request.user)
+                notif.is_read = True
+                notif.save()
+            except Notification.DoesNotExist:
+                pass
+        return redirect('core:notifications')
+
+    # Handle "mark all as read" action
+    if request.method == 'POST' and request.POST.get('action') == 'mark_all_read':
+        Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+        return redirect('core:notifications')
+
+    notifications = Notification.objects.filter(user=request.user)
+    context = {'notifications': notifications}
     return render(request, 'notifications.html', context)
 @login_required
 def chat_view(request):

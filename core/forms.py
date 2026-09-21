@@ -1,6 +1,8 @@
 # core/forms.py
 
 from django import forms
+from django.core.validators import FileExtensionValidator
+from django.contrib.auth.forms import PasswordChangeForm
 # Correctly import OUR custom User model and other models from this app
 from .models import User, StudentProfile, CompanyProfile, JobPosting, InterviewSchedule
 
@@ -145,14 +147,24 @@ class BulkUploadForm(forms.Form):
     )
 
 class ResumeUploadForm(forms.ModelForm):
-    """A simple form to handle resume file uploads."""
+    """Form to handle resume file uploads with PDF validation and 5MB limit."""
+    resume = forms.FileField(
+        label='Upload Your Resume (PDF only, max 5MB)',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+        required=False,
+    )
+
     class Meta:
         model = StudentProfile
-        # We only want the resume field in this form
         fields = ['resume']
-        labels = {
-            'resume': 'Upload Your Resume File (PDF or DOCX)',
-        }
+
+    def clean_resume(self):
+        resume = self.cleaned_data.get('resume')
+        if resume:
+            # Check file size (5MB = 5 * 1024 * 1024)
+            if resume.size > 5 * 1024 * 1024:
+                raise forms.ValidationError('File size must be under 5MB.')
+        return resume
 
 class InterviewScheduleForm(forms.ModelForm):
     """
@@ -170,3 +182,19 @@ class InterviewScheduleForm(forms.ModelForm):
             'round_name': 'Interview Round Name (e.g., Technical Round 1)',
             'venue_or_link': 'Venue or Meeting Link (e.g., Google Meet URL)',
         }
+
+
+class PasswordChangeCustomForm(PasswordChangeForm):
+    """Wrapper around Django's PasswordChangeForm with Bootstrap styling."""
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Current Password'}),
+        label='Current Password'
+    )
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'New Password'}),
+        label='New Password'
+    )
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm New Password'}),
+        label='Confirm New Password'
+    )
