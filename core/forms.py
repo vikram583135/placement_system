@@ -158,18 +158,6 @@ class InterviewScheduleForm(forms.ModelForm):
     """
     A form for scheduling an interview for shortlisted candidates.
     """
-    interview_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    interview_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))
-    
-    class Meta:
-        model = InterviewSchedule
-        # The application is linked in the view, not selected in the form.
-        fields = ['interview_date', 'interview_time', 'round_name', 'venue_or_link']
-
-class InterviewScheduleForm(forms.ModelForm):
-    """
-    A form for scheduling an interview for shortlisted candidates.
-    """
     # Use widgets to get user-friendly date and time inputs in the browser
     interview_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     interview_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))

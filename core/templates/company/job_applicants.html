@@ -69,12 +69,22 @@
                                     </button>
                                     {% endif %}
 
-                                    <a href="?action=shortlist&app_id={{ application.id }}"
-                                        class="btn btn-sm btn-outline-info" title="Shortlist"><i
-                                            class="fas fa-check"></i></a>
-                                    <a href="?action=reject&app_id={{ application.id }}"
-                                        class="btn btn-sm btn-outline-danger" title="Reject"><i
-                                            class="fas fa-times"></i></a>
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="app_id" value="{{ application.id }}">
+                                        <input type="hidden" name="individual_action" value="shortlist">
+                                        <button type="submit" class="btn btn-sm btn-outline-info" title="Shortlist">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="app_id" value="{{ application.id }}">
+                                        <input type="hidden" name="individual_action" value="reject">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

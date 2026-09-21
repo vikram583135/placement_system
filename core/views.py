@@ -1,23 +1,26 @@
 # core/views.py
 
-from django.shortcuts import render, redirect
-from django.http import HttpResponse # Useful for simple placeholder responses
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, JsonResponse, FileResponse, Http404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .decorators import student_required, company_required, admin_required
-from .forms import BulkUploadForm, StudentRegistrationForm, CompanyRegistrationForm, UserUpdateForm, StudentProfileForm, CompanyProfileForm, JobPostingForm, ResumeUploadForm, InterviewScheduleForm
+from .forms import (
+    BulkUploadForm, StudentRegistrationForm, CompanyRegistrationForm,
+    UserUpdateForm, StudentProfileForm, CompanyProfileForm,
+    JobPostingForm, ResumeUploadForm, InterviewScheduleForm
+)
 from django.contrib.auth.forms import AuthenticationForm
-from .models import User, StudentProfile, CompanyProfile, JobPosting, Application, InterviewSchedule, Document, AuditLog
-from django.http import HttpResponse
+from .models import (
+    User, StudentProfile, CompanyProfile, JobPosting,
+    Application, InterviewSchedule, Document, AuditLog
+)
 from django.core.paginator import Paginator
-from django.db.models import Q, Exists, OuterRef
-from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q, Exists, OuterRef, Count
+from django.db import transaction
 import csv
 import io
-from django.db import transaction
-from django.db.models import Count
-from django.http import JsonResponse
 from datetime import date
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -284,12 +287,21 @@ def job_detail_view(request, job_id):
     
     application_status = "NOT_ELIGIBLE" # Default status
     
-    # Check eligibility
-    is_eligible = (
-        student_profile.cgpa >= job.min_cgpa and
-        student_profile.backlogs <= job.max_backlogs and
-        student_profile.branch in job.allowed_branches.split(',')
-    )
+    # Check eligibility (with None-safe guards)
+    is_eligible = True
+    
+    if job.min_cgpa is not None:
+        if student_profile.cgpa is None or student_profile.cgpa < job.min_cgpa:
+            is_eligible = False
+    
+    if is_eligible and job.max_backlogs is not None:
+        if student_profile.backlogs > job.max_backlogs:
+            is_eligible = False
+    
+    if is_eligible and job.allowed_branches:
+        allowed_branches_list = [branch.strip() for branch in job.allowed_branches.split(',')]
+        if student_profile.branch not in allowed_branches_list:
+            is_eligible = False
     
     if is_eligible:
         application_status = "ELIGIBLE"
@@ -315,12 +327,21 @@ def apply_for_job_view(request, job_id):
     job = get_object_or_404(JobPosting, id=job_id)
     student_profile = request.user.student_profile
     
-    # Backend validation for eligibility
-    is_eligible = (
-        student_profile.cgpa >= job.min_cgpa and
-        student_profile.backlogs <= job.max_backlogs and
-        student_profile.branch in job.allowed_branches.split(',')
-    )
+    # Backend validation for eligibility (with None-safe guards)
+    is_eligible = True
+    
+    if job.min_cgpa is not None:
+        if student_profile.cgpa is None or student_profile.cgpa < job.min_cgpa:
+            is_eligible = False
+    
+    if is_eligible and job.max_backlogs is not None:
+        if student_profile.backlogs > job.max_backlogs:
+            is_eligible = False
+    
+    if is_eligible and job.allowed_branches:
+        allowed_branches_list = [branch.strip() for branch in job.allowed_branches.split(',')]
+        if student_profile.branch not in allowed_branches_list:
+            is_eligible = False
     
     # Check for duplicate applications
     already_applied = Application.objects.filter(job=job, student=student_profile).exists()
@@ -527,33 +548,33 @@ def job_applicants_view(request, job_id):
     """
     job = get_object_or_404(JobPosting, id=job_id, company=request.user.company_profile)
     
-    # Handle individual action buttons (GET requests)
-    if request.method == 'GET':
-        action = request.GET.get('action')
-        app_id = request.GET.get('app_id')
+    # Handle all actions via POST only (individual + bulk)
+    if request.method == 'POST':
+        # Check for individual action
+        individual_app_id = request.POST.get('app_id')
+        individual_action = request.POST.get('individual_action')
         
-        if action and app_id:
+        if individual_app_id and individual_action:
             try:
-                application = Application.objects.get(id=app_id, job=job)
-                if action == 'shortlist':
+                application = Application.objects.get(id=individual_app_id, job=job)
+                if individual_action == 'shortlist':
                     application.status = 'Shortlisted'
                     application.save()
                     messages.success(request, f'{application.student.user.get_full_name()} has been shortlisted.')
-                elif action == 'reject':
+                elif individual_action == 'reject':
                     application.status = 'Rejected'
                     application.save()
                     messages.warning(request, f'{application.student.user.get_full_name()} has been rejected.')
                 return redirect('core:job_applicants', job_id=job.id)
             except Application.DoesNotExist:
                 messages.error(request, 'Application not found.')
-    
-    # Handle bulk actions (POST requests)
-    if request.method == 'POST':
+        
+        # Check for bulk action
         app_ids = request.POST.getlist('selected_applications')
         action = request.POST.get('action')
         
         if app_ids and action:
-            selected_applications = Application.objects.filter(id__in=app_ids)
+            selected_applications = Application.objects.filter(id__in=app_ids, job=job)
             if action == 'shortlist':
                 updated_count = selected_applications.update(status='Shortlisted')
                 messages.success(request, f'{updated_count} candidate(s) have been shortlisted.')
@@ -993,39 +1014,6 @@ def audit_logs_view(request):
     return render(request, 'admin/audit_logs.html', context)
 
 
-@login_required
-@admin_required
-def analytics_view(request):
-    """
-    Gathers data and passes it to the analytics page for chart rendering.
-    """
-    # Example 1: Placement stats by branch
-    branch_stats = StudentProfile.objects.values('branch').annotate(
-        total=Count('user'),
-        placed=Count('user', filter=Q(is_placed=True))
-    ).order_by('-total')
-
-    # Example 2: Company engagement by jobs posted
-    company_stats = CompanyProfile.objects.annotate(
-        job_count=Count('jobs')
-    ).order_by('-job_count')[:10] # Top 10 companies
-
-    # Format data for Chart.js
-    branch_labels = [stat['branch'] for stat in branch_stats]
-    branch_total_data = [stat['total'] for stat in branch_stats]
-    branch_placed_data = [stat['placed'] for stat in branch_stats]
-
-    company_labels = [stat.name for stat in company_stats]
-    company_job_counts = [stat.job_count for stat in company_stats]
-
-    context = {
-        'branch_labels': JsonResponse(branch_labels, safe=False).content.decode(),
-        'branch_total_data': JsonResponse(branch_total_data, safe=False).content.decode(),
-        'branch_placed_data': JsonResponse(branch_placed_data, safe=False).content.decode(),
-        'company_labels': JsonResponse(company_labels, safe=False).content.decode(),
-        'company_job_counts': JsonResponse(company_job_counts, safe=False).content.decode(),
-    }
-    return render(request, 'admin/analytics.html', context)
 
 # ==============================================================================
 # 5. Utility & Shared Views
@@ -1052,23 +1040,57 @@ def chat_view(request):
     return render(request, 'chat.html')
 
 @login_required
-@admin_required # Or make it accessible to others if needed
+@admin_required
 def document_upload_view(request):
-    return render(request, 'admin/document_upload.html')
+    """Handles uploading and listing documents."""
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        uploaded_file = request.FILES.get('file')
+        if title and uploaded_file:
+            Document.objects.create(title=title, file=uploaded_file)
+            messages.success(request, f'Document "{title}" uploaded successfully.')
+            return redirect('core:document_upload')
+        else:
+            messages.error(request, 'Please provide both a title and a file.')
+    
+    documents = Document.objects.all().order_by('-uploaded_at')
+    return render(request, 'admin/document_upload.html', {'documents': documents})
 
 @login_required
 @admin_required
+@require_POST
 def delete_document_view(request, doc_id):
-    messages.success(request, 'Document deleted.')
+    """Deletes a document by ID."""
+    document = get_object_or_404(Document, id=doc_id)
+    doc_title = document.title
+    # Delete the physical file from storage
+    if document.file:
+        document.file.delete(save=False)
+    document.delete()
+    messages.success(request, f'Document "{doc_title}" has been deleted.')
     return redirect('core:document_upload')
 
 @login_required
 def view_resume_view(request, student_id):
-    # Add logic to fetch student's resume URL
-    return render(request, 'utils/view_resume.html')
+    """Serves a student's resume file for viewing/download."""
+    student_profile = get_object_or_404(StudentProfile, user_id=student_id)
+    
+    if not student_profile.resume:
+        messages.error(request, 'This student has not uploaded a resume.')
+        raise Http404('Resume not found.')
+    
+    # Serve the file inline (opens in browser for PDFs)
+    try:
+        return FileResponse(
+            student_profile.resume.open('rb'),
+            content_type='application/pdf',
+            as_attachment=False,
+            filename=f"{student_profile.user.get_full_name()}_resume.pdf"
+        )
+    except FileNotFoundError:
+        raise Http404('Resume file not found on server.')
 
 @login_required
-@admin_required
 @admin_required
 def analytics_view(request):
     """
