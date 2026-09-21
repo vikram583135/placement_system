@@ -29,3 +29,18 @@ def admin_required(function):
         redirect_field_name=None
     )
     return actual_decorator(function)
+
+from django.contrib import messages
+from django.shortcuts import redirect
+
+def company_approved_required(function):
+    # Decorator to ensure only approved companies can post jobs, etc.
+    def wrap(request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.role == 'company':
+            if hasattr(request.user, 'company_profile') and request.user.company_profile.is_approved:
+                return function(request, *args, **kwargs)
+            else:
+                messages.error(request, 'Your company profile is pending approval from the placement office.')
+                return redirect('core:company_dashboard')
+        return redirect('core:login')
+    return wrap
