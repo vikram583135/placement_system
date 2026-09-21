@@ -1,32 +1,92 @@
 {% extends 'company/company_base.html' %}
 {% block company_content %}
-<div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center"><h3 class="mb-0"><i class="fas fa-list-alt me-2"></i>Manage Your Job Postings</h3><a href="{% url 'core:post_job' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Post New Job</a></div>
-    <div class="card-body">
+<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="fas fa-list-alt text-primary me-2"></i>Manage Your Job Postings</h2>
+        <p class="text-muted mb-0">Track and manage all the jobs you have posted on the platform.</p>
+    </div>
+    <div>
+        <a href="{% url 'core:post_job' %}" class="btn btn-primary rounded-pill shadow-sm">
+            <i class="fas fa-plus me-2"></i>Post New Job
+        </a>
+    </div>
+</div>
+
+<div class="card card-glass border-0 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="card-body p-0">
         {% if jobs_page_obj %}
-        <div class="table-responsive"><table class="table table-hover align-middle">
-            <thead class="table-light"><tr><th>Job Title</th><th>Posted On</th><th>Deadline</th><th class="text-center">Applications</th><th class="text-center">Status</th><th class="text-center">Actions</th></tr></thead>
-            <tbody>
-                {% for job in jobs_page_obj %}
-                <tr>
-                    <td class="fw-bold">{{ job.title }}</td>
-                    <td>{{ job.posted_at|date:"M d, Y" }}</td>
-                    <td>{{ job.application_deadline|date:"M d, Y" }}</td>
-                    <td class="text-center"><a href="{% url 'core:job_applicants' job.id %}" class="badge bg-primary text-decoration-none p-2">{{ job.applications.count }} View</a></td>
-                    <td class="text-center">{% if not job.is_approved %}<span class="badge bg-warning">Pending Approval</span>{% elif job.application_deadline < today %}<span class="badge bg-secondary">Closed</span>{% else %}<span class="badge bg-success">Open</span>{% endif %}</td>
-                    <td class="text-center"><a href="{% url 'core:edit_job' job.id %}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fas fa-edit"></i></a><a href="{% url 'core:job_applicants' job.id %}" class="btn btn-sm btn-outline-info" title="View Applicants"><i class="fas fa-users"></i></a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table></div>
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
-                {% if jobs_page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ jobs_page_obj.previous_page_number }}">Previous</a></li>{% else %}<li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>{% endif %}
-                <li class="page-item active"><span class="page-link">Page {{ jobs_page_obj.number }} of {{ jobs_page_obj.paginator.num_pages }}</span></li>
-                {% if jobs_page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ jobs_page_obj.next_page_number }}">Next</a></li>{% else %}<li class="page-item disabled"><a class="page-link" href="#">Next</a></li>{% endif %}
-            </ul>
-        </nav>
-        {% else %}<div class="text-center p-4"><p class="lead">No jobs have been posted yet.</p></div>{% endif %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light">
+                    <tr>
+                        <th scope="col" class="px-4 py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Job Title</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Posted On</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Deadline</th>
+                        <th scope="col" class="py-3 text-center text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Applications</th>
+                        <th scope="col" class="py-3 text-center text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Status</th>
+                        <th scope="col" class="px-4 py-3 text-end text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for job in jobs_page_obj %}
+                    <tr class="animate-fade-in" style="animation-delay: {{ forloop.counter0|add:2 }}00ms;">
+                        <td class="px-4 py-3 fw-bold text-dark" data-theme-target="text">{{ job.title }}</td>
+                        <td class="py-3 text-muted"><i class="far fa-calendar-plus me-1 text-secondary"></i> {{ job.posted_at|date:"M d, Y" }}</td>
+                        <td class="py-3 text-muted"><i class="far fa-calendar-times me-1 text-danger"></i> {{ job.application_deadline|date:"M d, Y" }}</td>
+                        <td class="py-3 text-center">
+                            <a href="{% url 'core:job_applicants' job.id %}" class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill text-decoration-none px-3 py-2">
+                                <i class="fas fa-users me-1"></i> {{ job.applications.count }} View
+                            </a>
+                        </td>
+                        <td class="py-3 text-center">
+                            {% if not job.is_approved %}
+                                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill border border-warning border-opacity-25 px-3 py-2">Pending Approval</span>
+                            {% elif job.application_deadline < today %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill border border-secondary border-opacity-25 px-3 py-2">Closed</span>
+                            {% else %}
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill border border-success border-opacity-25 px-3 py-2">Open</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'core:edit_job' job.id %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm" title="Edit"><i class="fas fa-edit me-1"></i>Edit</a>
+                                <a href="{% url 'core:job_applicants' job.id %}" class="btn btn-sm btn-outline-info rounded-pill px-3 shadow-sm" title="View Applicants"><i class="fas fa-eye me-1"></i>Applicants</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="px-4 py-3 border-top">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if jobs_page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link rounded-start-pill" href="?page={{ jobs_page_obj.previous_page_number }}">Previous</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link rounded-start-pill" href="#">Previous</a></li>
+                    {% endif %}
+                    
+                    <li class="page-item active"><span class="page-link">Page {{ jobs_page_obj.number }} of {{ jobs_page_obj.paginator.num_pages }}</span></li>
+                    
+                    {% if jobs_page_obj.has_next %}
+                        <li class="page-item"><a class="page-link rounded-end-pill" href="?page={{ jobs_page_obj.next_page_number }}">Next</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link rounded-end-pill" href="#">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                <i class="fas fa-briefcase fs-1 text-muted"></i>
+            </div>
+            <h4 class="fw-bold">No jobs posted yet</h4>
+            <p class="text-muted mb-4">You haven't posted any jobs. Create your first job posting to attract candidates.</p>
+            <a href="{% url 'core:post_job' %}" class="btn btn-primary rounded-pill px-4 shadow-sm">Post Your First Job</a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -1,84 +1,170 @@
 {% extends 'admin/admin_base.html' %}
 
 {% block admin_content %}
-<h1 class="mt-4 fw-bold">Admin Dashboard</h1>
-<p class="text-muted">System-wide overview and analytics.</p>
+<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in">
+    <div>
+        <h1 class="fw-bold mb-1">Admin Dashboard</h1>
+        <p class="text-muted mb-0">System-wide overview and analytics.</p>
+    </div>
+</div>
 
-<div class="row g-4">
-    <div class="col-xl-3 col-md-6">
-        <div class="card border-primary shadow-sm h-100">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="fs-4 fw-bold">{{ student_count|default:"0" }}</div>
-                    <div class="text-muted">Total Students</div>
-                </div>
-                <i class="fas fa-user-graduate fa-3x text-primary opacity-50"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card border-info shadow-sm h-100">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="fs-4 fw-bold">{{ company_count|default:"0" }}</div>
-                    <div class="text-muted">Total Companies</div>
-                </div>
-                <i class="fas fa-building fa-3x text-info opacity-50"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card border-warning shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6 animate-fade-in" style="animation-delay: 0.1s;">
+        <div class="card card-glass border-0 border-start border-4 border-primary h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="fs-4 fw-bold">{{ pending_jobs_count|default:"0" }}</div>
-                        <div class="text-muted">Pending Job Approvals</div>
+                        <div class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.8rem;">Total Students</div>
+                        <div class="fs-2 fw-bold text-dark" data-theme-target="text">{{ student_count|default:"0" }}</div>
                     </div>
-                    <i class="fas fa-clock fa-3x text-warning opacity-50"></i>
+                    <div class="bg-primary bg-opacity-10 text-primary rounded p-3">
+                        <i class="fas fa-user-graduate fs-4"></i>
+                    </div>
                 </div>
             </div>
-             <div class="card-footer bg-transparent border-0 py-1">
-                <a class="small text-warning stretched-link text-decoration-none" href="{% url 'core:approve_jobs' %}">Review Now</a>
+            <div class="card-footer bg-transparent border-top-0 pt-0 pb-4 px-4">
+                <a href="{% url 'core:manage_students' %}" class="text-primary text-decoration-none small fw-semibold d-inline-flex align-items-center">
+                    Manage Students <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i>
+                </a>
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card border-success shadow-sm h-100">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="fs-4 fw-bold">{{ placed_count|default:"0" }}</div>
-                    <div class="text-muted">Students Placed</div>
+    
+    <div class="col-xl-3 col-md-6 animate-fade-in" style="animation-delay: 0.2s;">
+        <div class="card card-glass border-0 border-start border-4 border-info h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.8rem;">Total Companies</div>
+                        <div class="fs-2 fw-bold text-dark" data-theme-target="text">{{ company_count|default:"0" }}</div>
+                    </div>
+                    <div class="bg-info bg-opacity-10 text-info rounded p-3">
+                        <i class="fas fa-building fs-4"></i>
+                    </div>
                 </div>
-                <i class="fas fa-trophy fa-3x text-success opacity-50"></i>
+            </div>
+            <div class="card-footer bg-transparent border-top-0 pt-0 pb-4 px-4">
+                <a href="{% url 'core:manage_companies' %}" class="text-info text-decoration-none small fw-semibold d-inline-flex align-items-center">
+                    Manage Companies <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 animate-fade-in" style="animation-delay: 0.3s;">
+        <div class="card card-glass border-0 border-start border-4 border-warning h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.8rem;">Pending Job Approvals</div>
+                        <div class="fs-2 fw-bold text-dark" data-theme-target="text">{{ pending_jobs_count|default:"0" }}</div>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 text-warning rounded p-3">
+                        <i class="fas fa-clock fs-4 text-warning"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0 pt-0 pb-4 px-4">
+                <a href="{% url 'core:approve_jobs' %}" class="text-warning text-decoration-none small fw-semibold d-inline-flex align-items-center" style="color: #d97706 !important;">
+                    Review Now <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 animate-fade-in" style="animation-delay: 0.4s;">
+        <div class="card card-glass border-0 border-start border-4 border-success h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted mb-1 text-uppercase fw-semibold" style="font-size: 0.8rem;">Students Placed</div>
+                        <div class="fs-2 fw-bold text-dark" data-theme-target="text">{{ placed_count|default:"0" }}</div>
+                    </div>
+                    <div class="bg-success bg-opacity-10 text-success rounded p-3">
+                        <i class="fas fa-trophy fs-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0 pt-0 pb-4 px-4">
+                <a href="#" class="text-success text-decoration-none small fw-semibold d-inline-flex align-items-center">
+                    View Placements <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i>
+                </a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4 mt-4">
+<div class="row g-4 animate-fade-in" style="animation-delay: 0.5s;">
     <div class="col-lg-7">
-        <div class="card shadow-sm h-100">
-            <div class="card-header"><i class="fas fa-chart-bar me-2"></i>Registrations This Month</div>
-            <div class="card-body"><canvas id="registrationsChart"></canvas></div>
+        <div class="card card-glass border-0 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-chart-bar text-primary me-2"></i>Registrations This Month</h5>
+            </div>
+            <div class="card-body px-4 py-4">
+                <canvas id="registrationsChart" style="max-height: 300px;"></canvas>
+            </div>
         </div>
     </div>
     <div class="col-lg-5">
-        <div class="card shadow-sm h-100">
-            <div class="card-header"><i class="fas fa-chart-pie me-2"></i>Placement Status</div>
-            <div class="card-body"><canvas id="placementChart"></canvas></div>
+        <div class="card card-glass border-0 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-chart-pie text-success me-2"></i>Placement Status</h5>
+            </div>
+            <div class="card-body px-4 py-4 d-flex align-items-center justify-content-center">
+                <canvas id="placementChart" style="max-height: 300px;"></canvas>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="card shadow-sm mt-4">
-    <div class="card-header"><i class="fas fa-history me-2"></i>Recent System Activity</div>
-    <div class="card-body">
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>HR from Google</strong> posted a new job: "Senior Python Developer".</li>
-            <li class="list-group-item"><strong>Admin</strong> approved the job from "Microsoft".</li>
-            <li class="list-group-item"><strong>John Doe</strong> applied for the "Data Analyst" position at "Amazon".</li>
-        </ul>
+<div class="card card-glass border-0 mt-4 animate-fade-in" style="animation-delay: 0.6s;">
+    <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fas fa-history text-primary me-2"></i>Recent System Activity</h5>
+            <a href="{% url 'core:audit_logs' %}" class="btn btn-sm btn-outline-primary rounded-pill">View All Logs</a>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="position-relative">
+            <!-- Timeline Line -->
+            <div class="position-absolute h-100 bg-light" style="left: 19px; width: 2px; top: 10px;"></div>
+            
+            <div class="d-flex mb-4 position-relative z-index-1">
+                <div class="flex-shrink-0">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; z-index: 2;">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                </div>
+                <div class="ms-3 pt-2">
+                    <p class="mb-1 text-dark" data-theme-target="text"><strong>HR from Google</strong> posted a new job: "Senior Python Developer".</p>
+                    <small class="text-muted"><i class="far fa-clock me-1"></i> 2 hours ago</small>
+                </div>
+            </div>
+            
+            <div class="d-flex mb-4 position-relative z-index-1">
+                <div class="flex-shrink-0">
+                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; z-index: 2;">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                <div class="ms-3 pt-2">
+                    <p class="mb-1 text-dark" data-theme-target="text"><strong>Admin</strong> approved the job from "Microsoft".</p>
+                    <small class="text-muted"><i class="far fa-clock me-1"></i> 5 hours ago</small>
+                </div>
+            </div>
+            
+            <div class="d-flex position-relative z-index-1">
+                <div class="flex-shrink-0">
+                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; z-index: 2;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="ms-3 pt-2">
+                    <p class="mb-1 text-dark" data-theme-target="text"><strong>John Doe</strong> applied for the "Data Analyst" position at "Amazon".</p>
+                    <small class="text-muted"><i class="far fa-clock me-1"></i> 1 day ago</small>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -86,27 +172,106 @@
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // FAKE DATA - This should be dynamically populated from your Django view
-    // Placement Status Pie Chart
-    new Chart(document.getElementById('placementChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Placed', 'Not Placed'],
-          datasets: [{ data: [{{ placed_count|default:0 }}, {{ unplaced_count|default:0 }}], backgroundColor: ['#198754', '#6c757d'] }]
-        }
-    });
+    document.addEventListener("DOMContentLoaded", function() {
+        // Define theme-aware colors
+        const textColor = document.documentElement.getAttribute('data-theme') === 'dark' ? '#e2e8f0' : '#475569';
+        const gridColor = document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+        
+        // Placement Status Pie Chart
+        new Chart(document.getElementById('placementChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Placed', 'Not Placed'],
+                datasets: [{ 
+                    data: [{{ placed_count|default:0 }}, {{ unplaced_count|default:0 }}], 
+                    backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(100, 116, 139, 0.5)'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: textColor,
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        cornerRadius: 8
+                    }
+                }
+            }
+        });
 
-    // Registrations Bar Chart
-    new Chart(document.getElementById('registrationsChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-            datasets: [
-                { label: 'Students', data: [12, 19, 3, 5], backgroundColor: 'rgba(0, 123, 255, 0.7)' },
-                { label: 'Companies', data: [2, 3, 1, 1], backgroundColor: 'rgba(23, 162, 184, 0.7)' }
-            ]
-        },
-        options: { scales: { y: { beginAtZero: true } } }
+        // Registrations Bar Chart
+        new Chart(document.getElementById('registrationsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [
+                    { 
+                        label: 'Students', 
+                        data: [12, 19, 3, 5], 
+                        backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                        borderRadius: 4
+                    },
+                    { 
+                        label: 'Companies', 
+                        data: [2, 3, 1, 1], 
+                        backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: textColor,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        cornerRadius: 8
+                    }
+                },
+                scales: { 
+                    y: { 
+                        beginAtZero: true,
+                        grid: {
+                            color: gridColor,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    }
+                } 
+            }
+        });
     });
 </script>
 {% endblock %}

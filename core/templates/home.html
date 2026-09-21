@@ -5,84 +5,216 @@
 
 {% block content %}
 <!-- Main Hero Section -->
-<div class="container col-xxl-8 px-4 py-5">
-    <!-- ADDED WRAPPER: This new div will have the containerized background -->
-    <div class="content-container p-5">
-        <div class="row flex-lg-row-reverse align-items-center g-5">
-            <div class="col-10 col-sm-8 col-lg-6">
-                <img src="{% static 'images/LOGO1.jpg' %}" class="d-block mx-lg-auto img-fluid" alt="Team discussing work" width="700" height="500" loading="lazy">
-            </div>
-            <div class="col-lg-6">
-                <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Streamline Your Campus Placements</h1>
-                <p class="lead">An all-in-one platform connecting talented students with top-tier companies, managed seamlessly by your institution's placement cell. Automate, track, and succeed.</p>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                    <a href="#features" class="btn btn-primary btn-lg px-4 me-md-2">Explore Features</a>
-                    <a href="{% url 'core:login' %}" class="btn btn-outline-secondary btn-lg px-4">Get Started</a>
+<section class="hero-section position-relative overflow-hidden">
+    <!-- Decorative background elements -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50 z-index-1"></div>
+    
+    <div class="container position-relative z-index-2 pt-5">
+        <div class="row align-items-center justify-content-center text-center">
+            <div class="col-lg-10">
+                <span class="badge bg-white text-primary mb-3 px-3 py-2 animate-fade-in" style="animation-delay: 0.1s;">Elevating Careers, Empowering Institutions</span>
+                <h1 class="hero-title">Streamline Your Campus Placements</h1>
+                <p class="hero-subtitle mb-5 mx-auto" style="max-width: 700px;">
+                    An all-in-one ecosystem connecting top-tier talent with world-class organizations. Automate workflows, track progress, and unlock opportunities with PlacementPro.
+                </p>
+                <div class="d-flex gap-3 justify-content-center animate-fade-in" style="animation-delay: 0.3s;">
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'student' %}
+                            <a href="{% url 'core:student_dashboard' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">Go to Dashboard</a>
+                        {% elif user.role == 'company' %}
+                            <a href="{% url 'core:company_dashboard' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">Go to Dashboard</a>
+                        {% elif user.role == 'admin' %}
+                            <a href="{% url 'core:admin_dashboard' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">Go to Dashboard</a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'core:login' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg">Get Started</a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill">Explore Features</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-</div>
+    
+    <!-- Custom shape divider -->
+    <div class="position-absolute bottom-0 start-0 w-100 overflow-hidden" style="line-height: 0;">
+        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" style="position: relative; display: block; width: calc(100% + 1.3px); height: 60px;">
+            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" style="fill: var(--background-color);"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5" style="margin-top: -30px; position: relative; z-index: 10;">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-6 col-md-3">
+                <div class="card text-center h-100 py-4">
+                    <div class="card-body">
+                        <i class="fas fa-building fs-1 text-primary mb-3"></i>
+                        <h3 class="fw-bold fs-2 mb-1 text-dark" data-theme-target="text">500+</h3>
+                        <p class="text-muted mb-0">Partner Companies</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center h-100 py-4">
+                    <div class="card-body">
+                        <i class="fas fa-user-graduate fs-1 text-success mb-3"></i>
+                        <h3 class="fw-bold fs-2 mb-1 text-dark" data-theme-target="text">10k+</h3>
+                        <p class="text-muted mb-0">Students Placed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center h-100 py-4">
+                    <div class="card-body">
+                        <i class="fas fa-briefcase fs-1 text-warning mb-3"></i>
+                        <h3 class="fw-bold fs-2 mb-1 text-dark" data-theme-target="text">2,500+</h3>
+                        <p class="text-muted mb-0">Active Jobs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center h-100 py-4">
+                    <div class="card-body">
+                        <i class="fas fa-handshake fs-1 text-info mb-3"></i>
+                        <h3 class="fw-bold fs-2 mb-1 text-dark" data-theme-target="text">98%</h3>
+                        <p class="text-muted mb-0">Placement Rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Features Section -->
-<div class="container px-4 py-5" id="features">
-    <!-- ADDED WRAPPER: This new div will have the containerized background -->
-    <div class="content-container p-5">
-        <h2 class="pb-2 border-bottom text-center fw-bold">A Tailored Experience for Everyone</h2>
-        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-            <div class="col d-flex align-items-start">
-                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                    <i class="fas fa-user-graduate text-primary"></i>
-                </div>
-                <div>
-                    <h3 class="fs-2 text-body-emphasis">For Students</h3>
-                    <p>Build your profile, browse eligible jobs, apply with a single click, and track your interview schedules all in one place. Your dream job is just a few clicks away.</p>
+<section class="py-5 bg-transparent" id="features">
+    <div class="container py-5">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <span class="text-primary fw-bold text-uppercase tracking-wider">Features</span>
+                <h2 class="display-6 fw-bold mt-2">A Tailored Experience for Everyone</h2>
+                <p class="lead text-muted">PlacementPro provides specialized dashboards and tools for all stakeholders in the placement ecosystem.</p>
+            </div>
+        </div>
+
+        <div class="row g-5 align-items-center mb-5">
+            <div class="col-lg-6 order-lg-2">
+                <div class="position-relative">
+                    <div class="bg-primary rounded-circle position-absolute top-50 start-50 translate-middle opacity-25" style="width: 300px; height: 300px; filter: blur(50px);"></div>
+                    <img src="{% static 'images/LOGO1.jpg' %}" class="img-fluid rounded-4 shadow-lg position-relative z-index-2" alt="Students">
                 </div>
             </div>
-            <div class="col d-flex align-items-start">
-                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                    <i class="fas fa-building text-success"></i>
-                </div>
-                <div>
-                    <h3 class="fs-2 text-body-emphasis">For Companies</h3>
-                    <p>Publish job openings with specific criteria, view applications from top talent, shortlist candidates, and manage the entire interview process efficiently.</p>
+            <div class="col-lg-6 order-lg-1">
+                <div class="d-flex mb-4">
+                    <div class="flex-shrink-0 me-4">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                            <i class="fas fa-user-graduate fs-3"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold h4">For Students</h3>
+                        <p class="text-muted">Build a comprehensive profile, discover tailored opportunities, apply with a single click, and seamlessly track your application status and interview schedules.</p>
+                        <ul class="list-unstyled text-muted">
+                            <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> One-click applications</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Real-time status tracking</li>
+                            <li><i class="fas fa-check-circle text-primary me-2"></i> Direct interview scheduling</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="col d-flex align-items-start">
-                <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                    <i class="fas fa-user-shield text-danger"></i>
+        </div>
+
+        <div class="row g-5 align-items-center mb-5">
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <div class="bg-success rounded-circle position-absolute top-50 start-50 translate-middle opacity-25" style="width: 300px; height: 300px; filter: blur(50px);"></div>
+                    <img src="{% static 'images/LOGO.jpg' %}" class="img-fluid rounded-4 shadow-lg position-relative z-index-2" alt="Companies">
                 </div>
-                <div>
-                    <h3 class="fs-2 text-body-emphasis">For Admins</h3>
-                    <p>Oversee the entire placement ecosystem from a powerful dashboard. Manage users, approve jobs, and generate insightful reports to track placement success.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="d-flex mb-4">
+                    <div class="flex-shrink-0 me-4">
+                        <div class="bg-success bg-opacity-10 text-success rounded-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                            <i class="fas fa-building fs-3"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold h4">For Companies</h3>
+                        <p class="text-muted">Streamline your campus hiring. Publish targeted job openings, efficiently screen applicants, coordinate interviews, and extend offers effortlessly.</p>
+                        <ul class="list-unstyled text-muted">
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Targeted candidate filtering</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Integrated interview management</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Analytics on hiring funnel</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</section>
 
-{% block extra_head %}
-{{ block.super }}
-<style>
-    body {
-        background-image: url("{% static 'images/LOGO.jpg' %}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-attachment: fixed;
-    }
-
-    /* NEW STYLING FOR CONTENT CONTAINERS
-      This creates the "frosted glass" effect.
-    */
-    .content-container {
-        background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
-        backdrop-filter: blur(10px); /* This creates the blur effect */
-        -webkit-backdrop-filter: blur(10px); /* For Safari compatibility */
-        border-radius: 1rem; /* Rounded corners */
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Subtle shadow */
-        border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-</style>
+<!-- Testimonials Section -->
+<section class="py-5" style="background-color: rgba(79, 70, 229, 0.03);">
+    <div class="container py-5">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="fw-bold display-6">Trusted by Top Institutions</h2>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex text-warning mb-3">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="fst-italic text-muted mb-4">"PlacementPro revolutionized how we handle campus placements. What used to take days of manual tracking is now completely automated."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 48px; height: 48px;">DR</div>
+                            <div>
+                                <h6 class="fw-bold mb-0">Dr. Rajesh Kumar</h6>
+                                <small class="text-muted">Director of Placements, NIT</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex text-warning mb-3">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="fst-italic text-muted mb-4">"The student experience is incredible. I was able to track all my applications and get notified instantly when I was shortlisted."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 48px; height: 48px;">AS</div>
+                            <div>
+                                <h6 class="fw-bold mb-0">Anjali Sharma</h6>
+                                <small class="text-muted">Computer Science, Class of 2026</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex text-warning mb-3">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="fst-italic text-muted mb-4">"As a recruiter, we love the funnel view and interview scheduling tool. It saves our HR team countless hours during the hiring season."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 48px; height: 48px;">MV</div>
+                            <div>
+                                <h6 class="fw-bold mb-0">Michael Varun</h6>
+                                <small class="text-muted">Campus Recruiter, TechNova</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

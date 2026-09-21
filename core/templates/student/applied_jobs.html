@@ -1,42 +1,48 @@
 {% extends 'student/student_base.html' %}
 
 {% block student_content %}
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h3 class="mb-0"><i class="fas fa-check-square me-2"></i>Your Job Applications</h3>
+<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="fas fa-check-square text-primary me-2"></i>Your Job Applications</h2>
+        <p class="text-muted mb-0">Track the status of all your submitted applications.</p>
     </div>
-    <div class="card-body">
+</div>
+
+<div class="card card-glass border-0 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="card-body p-0">
         {% if applications %}
         <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-light">
+            <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light">
                     <tr>
-                        <th scope="col">Company</th>
-                        <th scope="col">Job Title</th>
-                        <th scope="col">Date Applied</th>
-                        <th scope="col" class="text-center">Status</th>
-                        <th scope="col" class="text-center">Action</th>
+                        <th scope="col" class="px-4 py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Company</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Job Title</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Date Applied</th>
+                        <th scope="col" class="py-3 text-center text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Status</th>
+                        <th scope="col" class="px-4 py-3 text-end text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="border-top-0">
                     {% for app in applications %}
-                    <tr>
-                        <td class="fw-bold">{{ app.job.company.name }}</td>
-                        <td>{{ app.job.title }}</td>
-                        <td>{{ app.applied_at|date:"F d, Y" }}</td>
-                        <td class="text-center">
+                    <tr class="animate-fade-in" style="animation-delay: {{ forloop.counter0|add:2 }}00ms;">
+                        <td class="px-4 py-3 fw-bold text-dark">{{ app.job.company.name }}</td>
+                        <td class="py-3 text-muted">{{ app.job.title }}</td>
+                        <td class="py-3 text-muted">
+                            <i class="far fa-clock me-1 text-secondary"></i> {{ app.applied_at|date:"M d, Y" }}
+                        </td>
+                        <td class="py-3 text-center">
                             {% if app.status == 'Shortlisted' or app.status == 'Offered' %}
-                                <span class="badge rounded-pill bg-success p-2">{{ app.status }}</span>
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill border border-success border-opacity-25 px-3 py-2">{{ app.status }}</span>
                             {% elif app.status == 'Rejected' %}
-                                <span class="badge rounded-pill bg-danger p-2">{{ app.status }}</span>
+                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill border border-danger border-opacity-25 px-3 py-2">{{ app.status }}</span>
                             {% elif app.status == 'Interview' %}
-                                <span class="badge rounded-pill bg-info p-2">{{ app.status }}</span>
+                                <span class="badge bg-info bg-opacity-10 text-info rounded-pill border border-info border-opacity-25 px-3 py-2">{{ app.status }}</span>
                             {% else %}
-                                <span class="badge rounded-pill bg-secondary p-2">{{ app.status }}</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill border border-secondary border-opacity-25 px-3 py-2">{{ app.status }}</span>
                             {% endif %}
                         </td>
-                        <td class="text-center">
-                            <a href="{% url 'core:job_detail' app.job.id %}" class="btn btn-sm btn-outline-primary">View Job Details</a>
+                        <td class="px-4 py-3 text-end">
+                            <a href="{% url 'core:job_detail' app.job.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">View Job</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -44,10 +50,13 @@
             </table>
         </div>
         {% else %}
-        <div class="text-center p-5">
-            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-            <p class="lead">You haven't applied to any jobs yet.</p>
-            <a href="{% url 'core:job_listings' %}" class="btn btn-primary mt-2">Find Jobs to Apply For</a>
+        <div class="text-center py-5">
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                <i class="fas fa-box-open fs-1 text-muted"></i>
+            </div>
+            <h4 class="fw-bold">No applications yet</h4>
+            <p class="text-muted mb-4">You haven't applied to any jobs yet. Start exploring opportunities!</p>
+            <a href="{% url 'core:job_listings' %}" class="btn btn-primary rounded-pill px-4 shadow-sm">Find Jobs to Apply For</a>
         </div>
         {% endif %}
     </div>

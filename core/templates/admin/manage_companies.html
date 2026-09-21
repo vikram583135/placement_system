@@ -1,32 +1,54 @@
 {% extends 'admin/admin_base.html' %}
 
 {% block admin_content %}
-<div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="mb-0"><i class="fas fa-building-user me-2"></i>Manage Companies</h3>
-         <div>
-            <a href="{% url 'core:bulk_upload' %}" class="btn btn-secondary"><i class="fas fa-upload me-2"></i>Bulk Upload</a>
-            <a href="#" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Add New Company</a>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="fas fa-building-user text-primary me-2"></i>Manage Companies</h2>
+        <p class="text-muted mb-0">View, search, filter, and manage all registered company accounts.</p>
     </div>
-    <div class="card-body">
+    <div class="d-flex gap-2">
+        <a href="{% url 'core:bulk_upload' %}" class="btn btn-outline-secondary rounded-pill shadow-sm px-3"><i class="fas fa-upload me-2"></i>Bulk Upload</a>
+        <a href="#" class="btn btn-primary rounded-pill shadow-sm px-3"><i class="fas fa-plus me-2"></i>Add Company</a>
+    </div>
+</div>
+
+<div class="card card-glass border-0 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr><th>Company Name</th><th>HR Contact</th><th class="text-center">Jobs Posted</th><th class="text-center">Status</th><th class="text-center">Actions</th></tr>
-                </thead>
-                <tbody>
-                     {% for company in companies_page_obj %}
+            <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light">
                     <tr>
-                        <td class="fw-bold">{{ company.name }}</td>
-                        <td>{{ company.user.email }}</td>
-                        <td class="text-center">{{ company.jobs.count }}</td>
-                        <td class="text-center">
-                           {% if company.is_approved %}<span class="badge bg-success">Approved</span>
-                           {% else %}<span class="badge bg-warning">Pending</span>{% endif %}
+                        <th scope="col" class="px-4 py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Company Name</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">HR Contact</th>
+                        <th scope="col" class="py-3 text-center text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Jobs Posted</th>
+                        <th scope="col" class="py-3 text-center text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Status</th>
+                        <th scope="col" class="px-4 py-3 text-end text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                     {% for company in companies_page_obj %}
+                    <tr class="animate-fade-in" style="animation-delay: {{ forloop.counter0|add:2 }}00ms;">
+                        <td class="px-4 py-3 fw-bold text-dark" data-theme-target="text">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                {{ company.name }}
+                            </div>
                         </td>
-                         <td class="text-center">
-                             <div class="btn-group">
+                        <td class="py-3 text-muted">{{ company.user.email }}</td>
+                        <td class="py-3 text-center">
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-1">{{ company.jobs.count }}</span>
+                        </td>
+                        <td class="py-3 text-center">
+                           {% if company.is_approved %}
+                               <span class="badge bg-success bg-opacity-10 text-success rounded-pill border border-success border-opacity-25 px-3 py-1">Approved</span>
+                           {% else %}
+                               <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill border border-warning border-opacity-25 px-3 py-1">Pending</span>
+                           {% endif %}
+                        </td>
+                         <td class="px-4 py-3 text-end">
+                             <div class="btn-group shadow-sm rounded-pill overflow-hidden">
                                 {% if not company.is_approved %}<a href="#" class="btn btn-sm btn-outline-success" title="Approve"><i class="fas fa-check"></i></a>{% endif %}
                                 <a href="#" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
                                 <a href="#" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash-alt"></i></a>
@@ -34,30 +56,41 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="text-center p-4">No companies found.</td></tr>
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-building-user fs-1 text-muted"></i>
+                            </div>
+                            <h5 class="fw-bold">No companies found</h5>
+                            <p class="text-muted mb-0">No companies are currently registered on the platform.</p>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center mt-4">
-                {% if companies_page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page={{ companies_page_obj.previous_page_number }}">Previous</a></li>
-                {% else %}
-                    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                {% endif %}
+        
+        <div class="px-4 py-3 border-top">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if companies_page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link rounded-start-pill" href="?page={{ companies_page_obj.previous_page_number }}">Previous</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link rounded-start-pill" href="#">Previous</a></li>
+                    {% endif %}
 
-                <li class="page-item active" aria-current="page">
-                    <span class="page-link">Page {{ companies_page_obj.number }} of {{ companies_page_obj.paginator.num_pages }}</span>
-                </li>
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">Page {{ companies_page_obj.number }} of {{ companies_page_obj.paginator.num_pages }}</span>
+                    </li>
 
-                {% if companies_page_obj.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ companies_page_obj.next_page_number }}">Next</a></li>
-                {% else %}
-                    <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
-                {% endif %}
-            </ul>
-        </nav>
+                    {% if companies_page_obj.has_next %}
+                        <li class="page-item"><a class="page-link rounded-end-pill" href="?page={{ companies_page_obj.next_page_number }}">Next</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link rounded-end-pill" href="#">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 {% endblock %}

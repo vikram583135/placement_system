@@ -2,45 +2,86 @@
 {% load crispy_forms_tags %}
 
 {% block company_content %}
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h3 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Schedule Interview for "{{ job.title }}"</h3>
+<div class="mb-4 animate-fade-in">
+    <a href="{% url 'core:job_applicants' job.id %}" class="btn btn-sm btn-outline-secondary rounded-pill mb-3">
+        <i class="fas fa-arrow-left me-2"></i>Back to Applicants
+    </a>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="fas fa-calendar-plus text-primary me-2"></i>Schedule Interview</h2>
+        <p class="text-muted mb-0">Set details for <span class="text-dark fw-semibold" data-theme-target="text">{{ job.title }}</span></p>
     </div>
-    <div class="card-body">
-        <p class="text-muted">Set the interview details below. An email notification will be sent to all shortlisted candidates for this job.</p>
-        
-        <h5 class="mt-4 fw-bold">Shortlisted Candidates ({{ shortlisted_count }})</h5>
-        {% if shortlisted_applications %}
-        <ul class="list-group mb-4">
-            {% for app in shortlisted_applications %}
-                <li class="list-group-item">{{ app.student.user.get_full_name }} ({{ app.student.user.email }})</li>
-            {% endfor %}
-        </ul>
+</div>
 
-        <form method="post" novalidate>
-            {% csrf_token %}
-            <fieldset class="border p-4 rounded">
-                <legend class="w-auto px-2 h6 fw-bold">Interview Details</legend>
-                <div class="row">
-                    <div class="col-md-6">{{ form.interview_date|as_crispy_field }}</div>
-                    <div class="col-md-6">{{ form.interview_time|as_crispy_field }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form.round_name|as_crispy_field }}</div>
-                    <div class="col-md-6">{{ form.mode|as_crispy_field }}</div>
-                </div>
-                {{ form.venue_or_link|as_crispy_field }}
-                {{ form.additional_instructions|as_crispy_field }}
-            </fieldset>
+<div class="card card-glass border-0 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="card-body p-5">
+        <div class="row gx-5">
+            <div class="col-lg-8">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <fieldset class="border-0 p-0 mb-4">
+                        <legend class="w-auto px-0 h5 fw-bold text-dark mb-4 border-bottom border-secondary border-opacity-25 pb-2 d-flex align-items-center w-100" data-theme-target="text">
+                            <div class="bg-primary bg-opacity-10 text-primary rounded p-2 me-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <i class="fas fa-info"></i>
+                            </div>
+                            Interview Details
+                        </legend>
+                        <div class="row gx-4">
+                            <div class="col-md-6 mb-3">{{ form.interview_date|as_crispy_field }}</div>
+                            <div class="col-md-6 mb-3">{{ form.interview_time|as_crispy_field }}</div>
+                        </div>
+                        <div class="row gx-4">
+                            <div class="col-md-6 mb-3">{{ form.round_name|as_crispy_field }}</div>
+                            <div class="col-md-6 mb-3">{{ form.mode|as_crispy_field }}</div>
+                        </div>
+                        <div class="mb-3">{{ form.venue_or_link|as_crispy_field }}</div>
+                        <div class="mb-4">{{ form.additional_instructions|as_crispy_field }}</div>
+                    </fieldset>
 
-            <button type="submit" class="btn btn-primary btn-lg mt-4"><i class="fas fa-paper-plane me-2"></i>Schedule & Notify Candidates</button>
-        </form>
-        {% else %}
-        <div class="alert alert-warning mt-3">
-             No candidates have been shortlisted for this job yet. Please shortlist candidates from the applicants list before scheduling an interview.
+                    {% if shortlisted_applications %}
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm"><i class="fas fa-paper-plane me-2"></i>Schedule & Notify Candidates</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-secondary btn-lg rounded-pill px-5 shadow-sm" disabled><i class="fas fa-ban me-2"></i>Cannot Schedule (No Candidates)</button>
+                    {% endif %}
+                </form>
+            </div>
+            
+            <div class="col-lg-4 mt-5 mt-lg-0">
+                <div class="card bg-light bg-opacity-50 border-0 rounded-4 shadow-sm h-100">
+                    <div class="card-body p-4">
+                         <h5 class="card-title fw-bold text-dark border-bottom border-secondary border-opacity-25 pb-3 mb-4 d-flex justify-content-between align-items-center" data-theme-target="text">
+                            <span><i class="fas fa-users text-primary me-2"></i>Shortlisted</span>
+                            <span class="badge bg-primary rounded-pill">{{ shortlisted_count }}</span>
+                         </h5>
+                         
+                         {% if shortlisted_applications %}
+                         <p class="small text-muted mb-3">An email notification will be sent to the following candidates:</p>
+                         <ul class="list-group list-group-flush bg-transparent">
+                             {% for app in shortlisted_applications %}
+                                 <li class="list-group-item bg-transparent px-0 border-secondary border-opacity-10 d-flex align-items-center">
+                                     <div class="bg-secondary bg-opacity-10 rounded-circle p-2 me-3 text-secondary d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
+                                         <i class="fas fa-user"></i>
+                                     </div>
+                                     <div>
+                                         <div class="fw-bold text-dark" data-theme-target="text">{{ app.student.user.get_full_name }}</div>
+                                         <div class="small text-muted" style="word-break: break-all;">{{ app.student.user.email }}</div>
+                                     </div>
+                                 </li>
+                             {% endfor %}
+                         </ul>
+                         {% else %}
+                         <div class="text-center py-4">
+                            <i class="fas fa-exclamation-circle text-warning fs-1 mb-3"></i>
+                            <p class="text-muted mb-0">No candidates have been shortlisted for this job yet.</p>
+                            <a href="{% url 'core:job_applicants' job.id %}" class="btn btn-sm btn-outline-primary rounded-pill mt-3">Go Shortlist Candidates</a>
+                         </div>
+                         {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-        <a href="{% url 'core:job_applicants' job.id %}" class="btn btn-secondary">Back to Applicants</a>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

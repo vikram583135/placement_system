@@ -1,154 +1,259 @@
 /* static/css/style.css */
 
 /* 1. Google Font Import */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
-/* 2. General Body & Layout Styles */
+/* 2. Design System Variables */
+:root {
+    /* Colors */
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary-color: #ec4899;
+    --background-color: #f3f4f6;
+    --surface-color: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    
+    /* Status Colors */
+    --status-success: #10b981;
+    --status-warning: #f59e0b;
+    --status-danger: #ef4444;
+    --status-info: #3b82f6;
+
+    /* Typography */
+    --font-sans: 'Inter', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    
+    /* Radius */
+    --radius-md: 0.5rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease-in-out;
+    --transition-normal: 0.3s ease-in-out;
+    --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 3. Base Styles */
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa; /* A light grey background for pages */
+    font-family: var(--font-sans);
+    background-color: var(--background-color);
+    color: var(--text-primary);
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
 }
 
 main {
-    flex: 1; /* Ensures the main content area grows to push the footer down */
+    flex: 1;
 }
 
 a {
-    transition: color 0.2s ease-in-out;
-}
-
-/* 3. Component Styling (Navbar, Footer, Cards, Buttons) */
-
-/* Navbar with a subtle shadow */
-.navbar {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-}
-
-/* Main Footer Styling */
-.footer {
-    background-color: #212529; /* A dark footer */
-    color: white;
-    padding: 40px 0;
-    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.07);
-}
-
-.footer a {
-    color: #adb5bd;
+    color: var(--primary-color);
     text-decoration: none;
-    transition: color 0.3s;
+    transition: color var(--transition-fast);
 }
 
-.footer a:hover {
-    color: #ffffff;
-    text-decoration: underline;
+a:hover {
+    color: var(--primary-hover);
+}
+
+/* 4. Glassmorphism & Components */
+
+/* Navbar */
+.navbar {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
 }
 
 /* Interactive Cards */
 .card {
     border: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: var(--radius-lg);
+    background: var(--surface-color);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--transition-bounce), box-shadow var(--transition-normal);
+    overflow: hidden;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
 }
 
-/* Button hover effect */
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    letter-spacing: 0.025em;
+}
+
 .btn-primary {
-    transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border: none;
+    box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.23);
 }
 
+/* Status Badges */
+.badge {
+    padding: 0.5em 0.8em;
+    border-radius: 9999px;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+.badge-applied { background-color: var(--status-info); color: white; }
+.badge-shortlisted { background-color: var(--primary-color); color: white; }
+.badge-interview { background-color: var(--status-warning); color: white; }
+.badge-offered { background-color: var(--status-success); color: white; }
+.badge-rejected { background-color: var(--status-danger); color: white; }
 
-/* 4. Page-Specific & Section Styling */
+/* 5. Page-Specific Sections */
 
-/* Home Page Hero Section */
+/* Hero Section */
 .hero-section {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2084&auto=format&fit=crop') no-repeat center center;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(236, 72, 153, 0.9)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2084&auto=format&fit=crop') no-repeat center center;
     background-size: cover;
     color: white;
-    padding: 100px 0;
+    padding: 120px 0;
     text-align: center;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
 }
 
-/* Icons used in feature sections */
-.feature-icon {
-    font-size: 3rem;
-    color: #0d6efd; /* Bootstrap Primary Blue */
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    animation: fadeInUp 1s ease-out;
 }
 
-/* For Home page feature list */
-.icon-square {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 0.75rem;
+.hero-subtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease-out 0.2s both;
 }
 
+/* 6. Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-/* 5. Panel & Sidebar Layout (Consolidated from base templates) */
+.animate-fade-in {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
 
+/* 7. Sidebar Panel Layout */
 .panel-wrapper {
     display: flex;
 }
 
 .sidebar-wrapper {
-    min-height: calc(100vh - 56px); /* Adjust 56px based on your navbar height */
-    width: 250px;
-    transition: margin .25s ease-out;
+    min-height: calc(100vh - 60px);
+    width: 260px;
+    background: var(--surface-color);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    z-index: 100;
+}
+
+.sidebar-wrapper .list-group-item {
+    border: none;
+    padding: 1rem 1.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    border-left: 3px solid transparent;
+}
+
+.sidebar-wrapper .list-group-item:hover {
+    background-color: rgba(79, 70, 229, 0.05);
+    color: var(--primary-color);
+}
+
+.sidebar-wrapper .list-group-item.active {
+    background-color: rgba(79, 70, 229, 0.1) !important;
+    color: var(--primary-color) !important;
+    border-left: 3px solid var(--primary-color);
 }
 
 .page-content-wrapper {
     flex: 1;
     min-width: 0;
+    padding: 2rem;
 }
 
-/* Active state for sidebar links */
-.sidebar-wrapper .list-group-item.active {
-    background-color: #0d6efd !important;
-    color: white !important;
-    border-color: #0d6efd !important;
-    font-weight: 600;
+/* 8. Forms & Inputs */
+.form-control, .form-select {
+    border-radius: var(--radius-md);
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1rem;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-/* Dark theme for Admin sidebar */
-.sidebar-wrapper.bg-dark .list-group-item-dark {
-    background-color: #212529;
-    color: #adb5bd;
-    border-color: #32383e;
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
-.sidebar-wrapper.bg-dark .list-group-item-dark:hover,
-.sidebar-wrapper.bg-dark .list-group-item-dark:focus {
-    background-color: #32383e;
-    color: #fff;
+/* Tables */
+.table {
+    vertical-align: middle;
+}
+.table-hover tbody tr {
+    transition: background-color var(--transition-fast);
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(79, 70, 229, 0.02);
 }
 
-
-/* 6. Utility Styles (Chat, Funnel, etc.) */
-
-/* Chat status indicators */
-.chat-online { color: #28a745; } /* Green */
-.chat-offline { color: #6c757d; } /* Grey */
-
-/* Chat Messages */
-.chat-messages {
-    display: flex;
-    flex-direction: column;
+/* Footer */
+.footer {
+    background-color: #111827;
+    color: #9ca3af;
+    padding: 3rem 0;
+    margin-top: auto;
 }
 
-/* Analytics Funnel Chart styling */
-.funnel-stage {
-    transition: transform 0.2s ease-in-out;
+.footer a {
+    color: #9ca3af;
 }
-.funnel-stage:hover {
-    transform: scale(1.02);
+
+.footer a:hover {
+    color: white;
 }

@@ -1,39 +1,53 @@
 {% extends 'company/company_base.html' %}
 
 {% block company_content %}
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h3 class="mb-0"><i class="fas fa-calendar-check me-2"></i>All Scheduled Interviews</h3>
+<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="fas fa-calendar-check text-primary me-2"></i>All Scheduled Interviews</h2>
+        <p class="text-muted mb-0">Manage your upcoming recruitment activities and scheduled interviews.</p>
     </div>
-    <div class="card-body">
-        <p class="text-muted">This page lists all interviews you have scheduled across all job postings. You can use this to manage your upcoming recruitment activities.</p>
-        
+</div>
+
+<div class="card card-glass border-0 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="card-body p-0">
         {% if interviews %}
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
+            <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light">
                     <tr>
-                        <th>Date & Time</th>
-                        <th>Job Title</th>
-                        <th>Candidate Name</th>
-                        <th>Round</th>
-                        <th>Mode / Venue</th>
-                        <th class="text-center">Status</th>
+                        <th scope="col" class="px-4 py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Date & Time</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Job Title</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Candidate Name</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Round</th>
+                        <th scope="col" class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Mode / Venue</th>
+                        <th scope="col" class="px-4 py-3 text-center text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="border-top-0">
                     {% for interview in interviews %}
-                    <tr class="{% if interview.is_past %}table-light text-muted{% endif %}">
-                        <td class="fw-bold">{{ interview.interview_date|date:"M d, Y" }}, {{ interview.interview_time|time:"h:i A" }}</td>
-                        <td>{{ interview.application.job.title }}</td>
-                        <td>{{ interview.application.student.user.get_full_name }}</td>
-                        <td><span class="badge bg-primary">{{ interview.round_name }}</span></td>
-                        <td>{{ interview.venue_or_link|truncatechars:30 }}</td>
-                        <td class="text-center">
+                    <tr class="animate-fade-in {% if interview.is_past %}opacity-75{% endif %}" style="animation-delay: {{ forloop.counter0|add:2 }}00ms;">
+                        <td class="px-4 py-3 fw-bold text-dark" data-theme-target="text">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded p-2 me-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="far fa-calendar-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ interview.interview_date|date:"M d, Y" }}</div>
+                                    <div class="small text-muted">{{ interview.interview_time|time:"h:i A" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 text-muted">{{ interview.application.job.title }}</td>
+                        <td class="py-3 text-muted">{{ interview.application.student.user.get_full_name }}</td>
+                        <td class="py-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2">{{ interview.round_name }}</span>
+                        </td>
+                        <td class="py-3 text-muted"><i class="fas fa-map-marker-alt me-1 text-secondary opacity-50"></i> {{ interview.venue_or_link|truncatechars:30 }}</td>
+                        <td class="px-4 py-3 text-center">
                              {% if interview.is_past %}
-                                <span class="badge bg-secondary">Completed</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2">Completed</span>
                              {% else %}
-                                <span class="badge bg-warning">Upcoming</span>
+                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2">Upcoming</span>
                              {% endif %}
                         </td>
                     </tr>
@@ -42,10 +56,12 @@
             </table>
         </div>
         {% else %}
-        <div class="text-center p-5">
-            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-            <p class="lead">You have not scheduled any interviews yet.</p>
-            <p class="text-muted">Once you shortlist candidates and schedule interviews, they will appear here.</p>
+        <div class="text-center py-5">
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                <i class="fas fa-calendar-times fs-1 text-muted"></i>
+            </div>
+            <h4 class="fw-bold">No interviews scheduled</h4>
+            <p class="text-muted mb-0">Once you shortlist candidates and schedule interviews, they will appear here.</p>
         </div>
         {% endif %}
     </div>

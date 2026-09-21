@@ -1,69 +1,90 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="{% url 'core:home' %}">
-            <i class="fas fa-graduation-cap me-2"></i>
-            PlacementPro
+        <a class="navbar-brand text-primary" href="{% url 'core:home' %}" style="font-size: 1.5rem;">
+            <i class="fas fa-graduation-cap me-2"></i>PlacementPro
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="main-nav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'core:home' %}">Home</a>
+                    <a class="nav-link fw-medium" href="{% url 'core:home' %}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'core:about' %}">About</a>
+                    <a class="nav-link fw-medium" href="{% url 'core:about' %}">About</a>
                 </li>
                 {% if user.is_authenticated and user.role == 'student' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:job_listings' %}">Find Jobs</a>
+                        <a class="nav-link fw-medium" href="{% url 'core:job_listings' %}">Find Jobs</a>
                     </li>
                 {% endif %}
             </ul>
 
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <!-- Dark Mode Toggle -->
+                <li class="nav-item me-2">
+                    <button class="btn btn-link nav-link" onclick="toggleTheme()" aria-label="Toggle theme">
+                        <i id="theme-icon" class="fas fa-moon"></i>
+                    </button>
+                </li>
+
                 {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle me-1"></i>
-                            Hello, {{ user.username }}
+                    <!-- Notification Bell -->
+                    <li class="nav-item me-3">
+                        <a href="{% url 'core:notifications' %}" class="nav-link position-relative" title="Notifications">
+                            <i class="fas fa-bell fs-5"></i>
+                            {% if unread_notifications_count and unread_notifications_count > 0 %}
+                            <span class="position-absolute top-25 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                                {{ unread_notifications_count }}
+                                <span class="visually-hidden">unread messages</span>
+                            </span>
+                            {% endif %}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                    </li>
+                    
+                    <!-- User Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle fw-medium d-flex align-items-center" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                                {{ user.username|make_list|first|upper }}
+                            </div>
+                            {{ user.first_name|default:user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="userMenu">
                             {% if user.role == 'admin' %}
-                                <li><a class="dropdown-item" href="{% url 'core:admin_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2"></i>Admin Dashboard</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'core:admin_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2 text-muted"></i>Dashboard</a></li>
                             {% elif user.role == 'student' %}
-                                <li><a class="dropdown-item" href="{% url 'core:student_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2"></i>Student Dashboard</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'core:student_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2 text-muted"></i>Dashboard</a></li>
                             {% elif user.role == 'company' %}
-                                <li><a class="dropdown-item" href="{% url 'core:company_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2"></i>Company Dashboard</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'core:company_dashboard' %}"><i class="fas fa-tachometer-alt fa-fw me-2 text-muted"></i>Dashboard</a></li>
                             {% endif %}
                             
                             {% if user.role == 'student' %}
-                                <li><a class="dropdown-item" href="{% url 'core:student_profile' %}"><i class="fas fa-user-edit fa-fw me-2"></i>My Profile</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'core:student_profile' %}"><i class="fas fa-user-edit fa-fw me-2 text-muted"></i>My Profile</a></li>
                             {% elif user.role == 'company' %}
-                                <li><a class="dropdown-item" href="{% url 'core:company_profile' %}"><i class="fas fa-id-card fa-fw me-2"></i>Company Profile</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'core:company_profile' %}"><i class="fas fa-id-card fa-fw me-2 text-muted"></i>Company Profile</a></li>
                             {% endif %}
                             
-                            <li><a class="dropdown-item" href="{% url 'core:notifications' %}"><i class="fas fa-bell fa-fw me-2"></i>Notifications</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li><hr class="dropdown-divider opacity-10"></li>
                             <li>
-                                <a class="dropdown-item text-danger" href="{% url 'core:logout' %}">
+                                <a class="dropdown-item py-2 text-danger" href="{% url 'core:logout' %}">
                                     <i class="fas fa-sign-out-alt fa-fw me-2"></i>Logout
                                 </a>
                             </li>
                         </ul>
                     </li>
                 {% else %}
-                    <li class="nav-item">
-                        <a href="{% url 'core:login' %}" class="btn btn-outline-primary me-2">Login</a>
+                    <li class="nav-item me-2">
+                        <a href="{% url 'core:login' %}" class="nav-link fw-medium px-3">Login</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="btn btn-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="btn btn-primary px-4 fw-medium dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Register
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'core:register_student' %}">As a Student</a></li>
-                            <li><a class="dropdown-item" href="{% url 'core:register_company' %}">As a Company</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                            <li><a class="dropdown-item py-2" href="{% url 'core:register_student' %}"><i class="fas fa-user-graduate fa-fw me-2 text-primary"></i>As a Student</a></li>
+                            <li><a class="dropdown-item py-2" href="{% url 'core:register_company' %}"><i class="fas fa-building fa-fw me-2 text-primary"></i>As a Company</a></li>
                         </ul>
                     </li>
                 {% endif %}

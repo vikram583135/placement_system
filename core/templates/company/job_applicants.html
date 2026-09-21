@@ -1,63 +1,74 @@
 {% extends 'company/company_base.html' %}
 
 {% block company_content %}
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h3 class="mb-0"><i class="fas fa-users me-2"></i>Applicants for: {{ job.title }}</h3>
+<div class="mb-4 animate-fade-in">
+    <a href="{% url 'core:posted_jobs' %}" class="btn btn-sm btn-outline-secondary rounded-pill mb-3">
+        <i class="fas fa-arrow-left me-2"></i>Back to Jobs
+    </a>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="fas fa-users text-primary me-2"></i>Applicants for: <span class="text-dark" data-theme-target="text">{{ job.title }}</span></h2>
+        <p class="text-muted mb-0">Review, shortlist, and manage candidates for this position.</p>
     </div>
-    <div class="card-body">
+</div>
+
+<div class="card card-glass border-0 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="card-body p-0">
 
         <form method="post"> <!-- Form for bulk actions -->
             {% csrf_token %}
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <label for="bulkAction" class="form-label me-2">With selected:</label>
-                    <select class="form-select d-inline-block w-auto me-2" name="action" id="bulkAction">
+            <div class="bg-light p-3 border-bottom d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <label for="bulkAction" class="form-label text-muted fw-bold small text-uppercase mb-0 me-3">With selected:</label>
+                    <select class="form-select form-select-sm d-inline-block w-auto me-2 border-0 shadow-sm" name="action" id="bulkAction">
+                        <option value="" disabled selected>Choose action...</option>
                         <option value="shortlist">Shortlist</option>
                         <option value="reject">Reject</option>
                     </select>
-                    <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">Apply</button>
                 </div>
             </div>
 
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                <table class="table table-hover align-middle mb-0 custom-table">
+                    <thead class="text-muted small text-uppercase">
                         <tr>
-                            <th><input class="form-check-input" type="checkbox" id="selectAll"></th>
-                            <th>Student Name</th>
-                            <th class="text-center">Resume</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Actions</th>
+                            <th class="px-4 py-3 border-0"><input class="form-check-input" type="checkbox" id="selectAll"></th>
+                            <th class="py-3 border-0">Student Name</th>
+                            <th class="py-3 text-center border-0">Resume</th>
+                            <th class="py-3 text-center border-0">Status</th>
+                            <th class="px-4 py-3 text-end border-0">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="border-top-0">
                         {% for application in applications %}
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox" name="selected_applications"
+                        <tr class="animate-fade-in" style="animation-delay: {{ forloop.counter0|add:2 }}00ms;">
+                            <td class="px-4 py-3"><input class="form-check-input shadow-sm" type="checkbox" name="selected_applications"
                                     value="{{ application.id }}"></td>
-                            <td class="fw-bold">{{ application.student.user.get_full_name }}</td>
-                            <td class="text-center">
+                            <td class="fw-bold py-3 text-dark" data-theme-target="text">{{ application.student.user.get_full_name }}</td>
+                            <td class="py-3 text-center">
                                 {% if application.student.resume %}
                                 <a href="{{ application.student.resume.url }}" target="_blank"
-                                    class="btn btn-sm btn-outline-secondary"><i class="fas fa-file-pdf"></i> View</a>
+                                    class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm"><i class="fas fa-file-pdf me-1 text-danger"></i> View</a>
                                 {% else %}
-                                <span class="text-muted small">No Resume</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-1">No Resume</span>
                                 {% endif %}
                             </td>
-                            <td class="text-center">
+                            <td class="py-3 text-center">
                                 {% if application.status == 'Offered' %}
-                                <span class="badge bg-success">Offered</span>
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill border border-success border-opacity-25 px-3 py-2">Offered</span>
                                 {% elif application.status == 'Shortlisted' %}
-                                <span class="badge bg-info">Shortlisted</span>
+                                <span class="badge bg-info bg-opacity-10 text-info rounded-pill border border-info border-opacity-25 px-3 py-2">Shortlisted</span>
                                 {% elif application.status == 'Rejected' %}
-                                <span class="badge bg-danger">Rejected</span>
+                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill border border-danger border-opacity-25 px-3 py-2">Rejected</span>
                                 {% else %}
-                                <span class="badge bg-secondary">{{ application.status }}</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill border border-secondary border-opacity-25 px-3 py-2">{{ application.status }}</span>
                                 {% endif %}
                             </td>
-                            <td class="text-center">
-                                <div class="btn-group">
+                            <td class="px-4 py-3 text-end">
+                                <div class="btn-group shadow-sm rounded-pill overflow-hidden">
                                     {% if application.status == 'Shortlisted' or application.status == 'Interview' %}
                                     <button type="button" 
                                         class="btn btn-sm btn-success offer-btn" 
@@ -69,28 +80,24 @@
                                     </button>
                                     {% endif %}
 
-                                    <form method="post" class="d-inline">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="app_id" value="{{ application.id }}">
-                                        <input type="hidden" name="individual_action" value="shortlist">
-                                        <button type="submit" class="btn btn-sm btn-outline-info" title="Shortlist">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
-                                    <form method="post" class="d-inline">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="app_id" value="{{ application.id }}">
-                                        <input type="hidden" name="individual_action" value="reject">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
+                                    <button type="submit" form="shortlist-form-{{ application.id }}" class="btn btn-sm btn-outline-info" title="Shortlist">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button type="submit" form="reject-form-{{ application.id }}" class="btn btn-sm btn-outline-danger" title="Reject">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center p-4">No applications received for this job yet.</td>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-users-slash fs-1 text-muted"></i>
+                                </div>
+                                <h5 class="fw-bold">No applications yet</h5>
+                                <p class="text-muted mb-0">No one has applied for this job posting yet.</p>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -98,20 +105,33 @@
             </div>
         </form>
         
-        <!-- Hidden forms for offer actions (outside nested form structure) -->
+        <!-- Hidden forms for individual actions (outside nested form structure) -->
         {% for application in applications %}
-        {% if application.status == 'Shortlisted' or application.status == 'Interview' %}
-        <form method="post" 
-              id="offer-form-{{ application.id }}"
-              action="{% url 'core:offer_candidate' job_id=job.id application_id=application.id %}"
-              style="display: none;">
-            {% csrf_token %}
-        </form>
-        {% endif %}
+            <form method="post" id="shortlist-form-{{ application.id }}" class="d-none">
+                {% csrf_token %}
+                <input type="hidden" name="app_id" value="{{ application.id }}">
+                <input type="hidden" name="individual_action" value="shortlist">
+            </form>
+            <form method="post" id="reject-form-{{ application.id }}" class="d-none">
+                {% csrf_token %}
+                <input type="hidden" name="app_id" value="{{ application.id }}">
+                <input type="hidden" name="individual_action" value="reject">
+            </form>
+            {% if application.status == 'Shortlisted' or application.status == 'Interview' %}
+            <form method="post" 
+                id="offer-form-{{ application.id }}"
+                action="{% url 'core:offer_candidate' job_id=job.id application_id=application.id %}"
+                class="d-none">
+                {% csrf_token %}
+            </form>
+            {% endif %}
         {% endfor %}
         
-        <a href="{% url 'core:schedule_interview' job.id %}" class="btn btn-info mt-3"><i
-                class="fas fa-calendar-plus me-2"></i>Schedule Interview for Shortlisted</a>
+        <div class="card-footer bg-transparent border-top p-4 d-flex justify-content-end">
+            <a href="{% url 'core:schedule_interview' job.id %}" class="btn btn-info rounded-pill shadow-sm px-4 text-white">
+                <i class="fas fa-calendar-plus me-2"></i>Schedule Interview
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}
