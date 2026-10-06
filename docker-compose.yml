@@ -1,0 +1,140 @@
+# ==============================================================================
+# docker-compose.yml - Local Development with Docker
+# ==============================================================================
+# Usage: docker-compose up --build
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # --------------------------------------------------------------
+  # PostgreSQL Database
+  # --------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: placement-db
+    environment:
+      POSTGRES_DB: placement
+      POSTGRES_USER: placement_user
+      POSTGRES_PASSWORD: placement_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U placement_user -d placement"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --------------------------------------------------------------
+  # Redis (for Celery, caching, sessions)
+  # --------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: placement-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --------------------------------------------------------------
+  # Django Web Application
+  # --------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: placement-web
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn placement_system.wsgi:application --bind 0.0.0.0:8000 --workers 4"
+    volumes:
+      - .:/app
+      - media_files:/app/media
+      - static_files:/app/staticfiles
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-dev-key-change-in-production
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - DATABASE_URL=postgresql://placement_user:placement_pass@db:5432/placement
+      - REDIS_URL=redis://redis:6379/0
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_USE_TLS=True
+      # - EMAIL_HOST_USER=your_email@gmail.com
+      # - EMAIL_HOST_PASSWORD=your_app_password
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.local
+
+  # --------------------------------------------------------------
+  # Celery Worker (for background tasks)
+  # --------------------------------------------------------------
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: placement-celery
+    command: celery -A placement_system worker --loglevel=info --concurrency=4
+    volumes:
+      - .:/app
+      - media_files:/app/media
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-dev-key-change-in-production
+      - DATABASE_URL=postgresql://placement_user:placement_pass@db:5432/placement
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.local
+
+  # --------------------------------------------------------------
+  # Celery Beat (for scheduled tasks)
+  # --------------------------------------------------------------
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: placement-celery-beat
+    command: celery -A placement_system beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-dev-key-change-in-production
+      - DATABASE_URL=postgresql://placement_user:placement_pass@db:5432/placement
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env.local
+
+volumes:
+  postgres_data:
+  redis_data:
+  media_files:
+  static_files:
+
+networks:
+  default:
+    name: placement-network

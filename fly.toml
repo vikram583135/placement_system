@@ -1,0 +1,73 @@
+# ==============================================================================
+# fly.toml - Fly.io Deployment Configuration
+# ==============================================================================
+# Deploy: fly launch --name placement-system --region ord
+# Then: fly deploy
+# ==============================================================================
+
+app = "placement-system"
+primary_region = "ord"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  DEBUG = "False"
+  ALLOWED_HOSTS = "placement-system.fly.dev"
+  # SECRET_KEY set via: fly secrets set SECRET_KEY="$(openssl rand -base64 32)"
+  # DATABASE_URL set via: fly postgres attach placement-db
+  # EMAIL_* set via: fly secrets set EMAIL_HOST_USER=... EMAIL_HOST_PASSWORD=...
+  # CLOUDINARY_* set via: fly secrets set CLOUDINARY_CLOUD_NAME=...
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    path = "/"
+    timeout = "5s"
+
+# --------------------------------------------------------------
+# VM Configuration (Free tier: shared-cpu-1x, 256MB RAM)
+# --------------------------------------------------------------
+[[vm]]
+  size = "shared-cpu-1x"
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+
+# --------------------------------------------------------------
+# Persistent Volume for Media Files (Free: 3GB)
+# --------------------------------------------------------------
+[mounts]
+  source = "placement_media"
+  destination = "/app/media"
+
+# --------------------------------------------------------------
+# Scaling Configuration
+# --------------------------------------------------------------
+[[services]]
+  protocol = "tcp"
+  internal_port = 8000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [[services.tcp_checks]]
+    grace_period = "10s"
+    interval = "30s"
+    timeout = "5s"

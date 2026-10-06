@@ -22,6 +22,30 @@ import io
 from datetime import date
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from django.db import connection
+
+
+def health_check(request):
+    """
+    Health check endpoint for deployment monitoring (Render, Fly.io, Railway, etc.)
+    Returns 200 OK if database is accessible, 503 if not.
+    """
+    try:
+        # Test database connection
+        connection.ensure_connection()
+        return JsonResponse({
+            'status': 'healthy',
+            'database': 'connected',
+            'timestamp': timezone.now().isoformat(),
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'unhealthy',
+            'database': 'disconnected',
+            'error': str(e),
+            'timestamp': timezone.now().isoformat(),
+        }, status=503)
+
 
 @login_required
 def notifications_view(request):

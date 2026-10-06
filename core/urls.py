@@ -73,4 +73,7 @@ urlpatterns = [
     path('documents/upload/', views.document_upload_view, name='document_upload'),
     path('documents/delete/<int:doc_id>/', views.delete_document_view, name='delete_document'),
     path('resume/view/<int:student_id>/', views.view_resume_view, name='view_resume'),
+
+    # Health check for deployment monitoring
+    path('health/', views.health_check, name='health_check'),
 ]

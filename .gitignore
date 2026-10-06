@@ -253,3 +253,28 @@ logs/
 # Debug files
 debug.log
 django-debug.log
+
+# ========================
+# Deployment Files (keep templates, ignore local configs)
+# ========================
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Docker
+.docker/
+
+# Fly.io
+fly.toml.local
+
+# Railway
+railway.json.local
+
+# Render
+render.yaml.local
+
+# IDE deployment configs
+.vscode/launch.json
+.idea/runConfigurations/

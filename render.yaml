@@ -1,24 +1,142 @@
+# ==============================================================================
+# Render Blueprint Configuration for Placement Management System
+# ==============================================================================
+# This file enables one-click deployment on Render.com
+# Push to GitHub → Connect repo on Render → Blueprint auto-detects this file
+# ==============================================================================
+
 databases:
   - name: placement-db
     databaseName: placement
     user: placement_user
+    # Free tier: 90 days, then $7/mo
+    # For permanent free PostgreSQL, use Neon (neon.tech) and set DATABASE_URL manually
+    plan: free
 
 services:
+  # --------------------------------------------------------------
+  # Web Service: Django Application
+  # --------------------------------------------------------------
   - type: web
     name: placement-system
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn placement_system.wsgi:application"
+    region: oregon  # or frankfurt, singapore
+    plan: free  # 750 hrs/month, spins down after 15 min inactivity
+    
+    branch: master
+    
+    # Build & Start Commands
+    buildCommand: "bash ./build.sh"
+    startCommand: "gunicorn placement_system.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+    
+    # Health Check (prevents spin-down during checks)
+    healthCheckPath: /health/
+    
+    # Auto-deploy on push to master
+    autoDeploy: true
+    
+    # Environment Variables
     envVars:
+      # Django Core
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      
+      # Database (auto-connected from placement-db above)
       - key: DATABASE_URL
         fromDatabase:
           name: placement-db
           property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: WEB_CONCURRENCY
-        value: 4
+      
+      # Email (configure after deploy in Render dashboard)
+      - key: EMAIL_HOST
+        value: "smtp.gmail.com"
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_USE_TLS
+        value: "True"
+      - key: EMAIL_HOST_USER
+        sync: false  # Set manually in dashboard
+      - key: EMAIL_HOST_PASSWORD
+        sync: false  # Set manually in dashboard (Gmail App Password)
+      
+      # Cloudinary for Media Files (configure after deploy)
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      
+      # Python Version
       - key: PYTHON_VERSION
-        value: 3.11.0
-      - key: DEBUG
-        value: False
+        value: "3.11.0"
+      
+      # Gunicorn Workers
+      - key: WEB_CONCURRENCY
+        value: "2"
+
+  # --------------------------------------------------------------
+  # Background Worker: Celery (for async tasks - optional)
+  # --------------------------------------------------------------
+  # Uncomment if you add Celery for background jobs (email, reports, etc.)
+  # Requires Redis (add Redis service below)
+  #
+  # - type: worker
+  #   name: placement-celery-worker
+  #   env: python
+  #   plan: free
+  #   buildCommand: "./build.sh"
+  #   startCommand: "celery -A placement_system worker --loglevel=info"
+  #   envVars:
+  #     - key: SECRET_KEY
+  #       fromService:
+  #         name: placement-system
+  #         type: web
+  #         property: envVars.SECRET_KEY
+  #     - key: DATABASE_URL
+  #       fromDatabase:
+  #         name: placement-db
+  #         property: connectionString
+  #     - key: REDIS_URL
+  #       fromService:
+  #         name: placement-redis
+  #         type: redis
+  #         property: connectionString
+
+  # --------------------------------------------------------------
+  # Redis: For Celery, Caching, Sessions (optional)
+  # --------------------------------------------------------------
+  # Uncomment if using Celery or Django cache framework
+  #
+  # - type: redis
+  #   name: placement-redis
+  #   plan: free  # 25MB, no persistence
+  #   maxmemoryPolicy: allkeys-lru
+
+# ==============================================================================
+# POST-DEPLOYMENT STEPS (Run in Render Shell after first deploy)
+# ==============================================================================
+# 1. Create superuser:
+#    python manage.py createsuperuser
+#
+# 2. Update ALLOWED_HOSTS in Render Dashboard:
+#    - Go to Service → Environment
+#    - Add your custom domain: placement-system.onrender.com,yourdomain.com
+#
+# 3. Configure Email:
+#    - Add EMAIL_HOST_USER (your Gmail)
+#    - Add EMAIL_HOST_PASSWORD (Gmail App Password)
+#
+# 4. Configure Cloudinary (for media files):
+#    - Add CLOUDINARY_CLOUD_NAME, API_KEY, API_SECRET
+#
+# 5. Custom Domain (optional):
+#    - Settings → Custom Domains → Add domain
+#    - Update DNS at registrar (CNAME to placement-system.onrender.com)
+#    - Enable Cloudflare proxy for free SSL/CDN
