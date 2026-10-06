@@ -16,6 +16,8 @@ Before deploying, ensure you have:
 
 ## 🎯 Option 1: Render (Recommended) — ⭐ Easiest for Django
 
+> 🌐 **Live App URL:** [https://placement-system-bpbb.onrender.com/](https://placement-system-bpbb.onrender.com/)
+
 **Free Tier**: 750 hours/month, PostgreSQL database, SSL, custom domains
 
 ### Step 1: Push to GitHub

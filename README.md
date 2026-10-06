@@ -6,6 +6,8 @@
     <a href="#-features"><strong>Explore Features »</strong></a>
     <br />
     <br />
+    <a href="https://placement-system-bpbb.onrender.com/"><strong>🚀 Live Demo</strong></a>
+    ·
     <a href="#-installation">Installation</a>
     ·
     <a href="https://github.com/vikram583135/placement_system/issues/new?labels=bug">Report Bug</a>
@@ -15,6 +17,7 @@
 </p>
 
 <p align="center">
+  <a href="https://placement-system-bpbb.onrender.com/"><img src="https://img.shields.io/badge/Render-Live%20Demo-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render Live Demo"></a>
   <img src="https://img.shields.io/badge/Django-5.2.3-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
   <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Bootstrap-5.3.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap">
@@ -45,6 +48,8 @@
 ---
 
 ## 🎯 Overview
+
+> 🚀 **Live Demo:** Access the live deployed application on Render: **[https://placement-system-bpbb.onrender.com/](https://placement-system-bpbb.onrender.com/)**
 
 The **Placement Management System** is designed to automate and simplify the entire campus recruitment process. It provides dedicated interfaces for three types of users:
 
